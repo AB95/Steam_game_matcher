@@ -84,3 +84,29 @@ def getMetaScore(game):
     result = soup.find("div", id="game_area_metascore").text
     return result[:result.find("/")]
 
+
+def getReviews(game):
+    url = "http://store.steampowered.com/app/" + str(game[1])
+
+    driver = webdriver.Firefox()
+    driver.get(url)
+    if "agecheck" in driver.current_url:
+        driver.find_element_by_xpath("//select[@name='ageYear']/option[text()='1990']").click()
+        driver.find_element_by_class_name("btnv6_blue_hoverfade").click()
+    html = driver.page_source
+    driver.close()
+
+    soup = BS.BeautifulSoup(html)
+    votes = str(soup.find(id="ReviewsTab_positive"))
+    positive = votes[votes.find('t">')+4:votes.find(")</")]
+
+    votes = str(soup.find(id="ReviewsTab_negative"))
+    negative = votes[votes.find('t">')+4:votes.find(")</")]
+    return positive, negative
+
+
+games = getMatchingGames(["alexishbob2", "q1w2e3286"])
+
+games.sort()
+
+getReviews(games[5])
