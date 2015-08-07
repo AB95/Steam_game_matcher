@@ -1,6 +1,8 @@
 import urllib2 as urllib
 import json
 import xml.etree.ElementTree as ET
+import BeautifulSoup as BS
+from selenium import webdriver
 
 
 def _getOwnedGamesByUserID(userID, includeFree):
@@ -12,7 +14,7 @@ def _getOwnedGamesByUserID(userID, includeFree):
     games = []
 
     for i in data["response"]["games"]:
-        games.append(i["name"])
+        games.append((i["name"], i["appid"]))
 
     return games
 
@@ -38,20 +40,47 @@ def getMatchingGames(users, includeFree=0):
 
         for i in xrange(1, len(users)):
             gamesList = getOwnedGames(users[i])
-            print len(gamesList), users[i]
             games = [x for x in games if x in gamesList]
 
-        print "---------------------"
         return games
 
     elif len(users) == 1:
         return getOwnedGames(users[0])
 
 
-# print getOwnedGames("76561198032447319")
-games = getMatchingGames(["alexishbob2", "q1w2e3286"])
+def getTags(game):
+    url = "http://store.steampowered.com/app/" + str(game[1])
 
-games.sort()
+    driver = webdriver.Firefox()
+    driver.get(url)
+    if "agecheck" in driver.current_url:
+        driver.find_element_by_xpath("//select[@name='ageYear']/option[text()='1990']").click()
+        driver.find_element_by_class_name("btnv6_blue_hoverfade").click()
+    html = driver.page_source
+    driver.close()
 
-for i in games:
-    print i
+    soup = BS.BeautifulSoup(html)
+    scriptResults = soup('script',{'type' : 'text/javascript'})
+    tag = scriptResults[26]
+    tagString = tag.string
+    tags = tagString[tagString.index("["):tagString.index(",", tagString.index("]"))]
+
+    data = json.loads(tags)
+    return [x["name"] for x in data]
+
+
+def getMetaScore(game):
+    url = "http://store.steampowered.com/app/" + str(game[1])
+
+    driver = webdriver.Firefox()
+    driver.get(url)
+    if "agecheck" in driver.current_url:
+        driver.find_element_by_xpath("//select[@name='ageYear']/option[text()='1990']").click()
+        driver.find_element_by_class_name("btnv6_blue_hoverfade").click()
+    html = driver.page_source
+    driver.close()
+
+    soup = BS.BeautifulSoup(html)
+    result = soup.find("div", id="game_area_metascore").text
+    return result[:result.find("/")]
+
