@@ -5,108 +5,106 @@ import BeautifulSoup as BS
 from selenium import webdriver
 
 
-def _getOwnedGamesByUserID(userID, includeFree):
-    url = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=E770C55138B535447F8678136EFC9285&steamid=" + \
-          userID + "&format=json&include_played_free_games=" + str(includeFree) + "&include_appinfo=1"
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
+class User:
 
-    games = []
+    def __init__(self, name):
+        #check if username or ID
+        try:
+            int(name)
+            self.name = name
+        except ValueError:
+            self.name = self._getID(name)
 
-    for i in data["response"]["games"]:
-        games.append((i["name"], i["appid"]))
+        self.games = []
+        self.friends = []
 
-    return games
+    def get_games(self):
+        url = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=E770C55138B535447F8678136EFC9285&steamid=" + \
+            self.name + "&format=json&include_played_free_games=1&include_appinfo=1"
+        response = urllib.urlopen(url)
+        data = json.loads(response.read())
 
+        for i in data["response"]["games"]:
+            self.games.append(Game(i["appid"], i["img_icon_url"], i["name"], i["playtime_forever"]))
 
-def _getID(username):
-    url = "http://www.steamcommunity.com/id/" + username + "?xml=1"
-    response = urllib.urlopen(url)
-    tree = ET.parse(response)
-    root = tree.getroot()
-    return root[0].text
+    def get_friends(self):
+        url = "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=E770C55138B535447F8678136EFC9285&steamid=" + \
+              self.name + "&relationship=friend"
+        response = urllib.urlopen(url)
+        data = json.loads(response.read())
 
+        for i in data["friendslist"]["friends"]:
+            self.friends.append(User(i["steamid"]))
 
-def getOwnedGames(user, includeFree=0):
-    try:
-        return _getOwnedGamesByUserID(user, includeFree)
-    except urllib.HTTPError:
-        return _getOwnedGamesByUserID(_getID(user), includeFree)
+    def get_matching_games(self, users):
 
+        games = self.games
 
-def getMatchingGames(users, includeFree=0):
-    if len(users) > 1:
-        games = getOwnedGames(users[0])
-
-        for i in xrange(1, len(users)):
-            gamesList = getOwnedGames(users[i])
-            games = [x for x in games if x in gamesList]
+        for i in users:
+            if i.name != self.name:
+                games = [x for x in games if x in i.games]
 
         return games
 
-    elif len(users) == 1:
-        return getOwnedGames(users[0])
+    # TODO: fix this
+    def _getID(self, username):
+        if "steamcommunity.com" in username:
+            url = username
+            if "http://" not in username:
+                url = "http://" + url
+            if "www." not in username:
+                url = "www." + url
+            if "?xml=1" not in username:
+                url += "?xml=1"
+        else:
+            url = "http://www.steamcommunity.com/id/" + username + "?xml=1"
+        response = urllib.urlopen(url)
+        tree = ET.parse(response)
+        root = tree.getroot()
+        return root[0].text
 
 
-def getTags(game):
-    url = "http://store.steampowered.com/app/" + str(game[1])
+class Game:
 
-    driver = webdriver.Firefox()
-    driver.get(url)
-    if "agecheck" in driver.current_url:
-        driver.find_element_by_xpath("//select[@name='ageYear']/option[text()='1990']").click()
-        driver.find_element_by_class_name("btnv6_blue_hoverfade").click()
-    html = driver.page_source
-    driver.close()
+    def __init__(self, appid, imageURL, name, playtime):
+        self.appid = appid
+        self.imageURL = imageURL
+        self.name = name
+        self.playtime = int(playtime)
 
-    soup = BS.BeautifulSoup(html)
-    scriptResults = soup('script',{'type' : 'text/javascript'})
-    tag = scriptResults[26]
-    tagString = tag.string
-    tags = tagString[tagString.index("["):tagString.index(",", tagString.index("]"))]
+    def getDetails(self):
+        self._scrape_details()
 
-    data = json.loads(tags)
-    return [x["name"] for x in data]
+    def _scrape_details(self):
+        url = "http://store.steampowered.com/app/" + self.appid
 
+        # use driver to generate full HTML
+        driver = webdriver.Firefox()
+        driver.get(url)
 
-def getMetaScore(game):
-    url = "http://store.steampowered.com/app/" + str(game[1])
+        # bypass agecheck if necessary
+        if "agecheck" in driver.current_url:
+            driver.find_element_by_xpath("//select[@name='ageYear']/option[text()='1990']").click()
+            driver.find_element_by_class_name("btnv6_blue_hoverfade").click()
+        html = driver.page_source
+        driver.close()
 
-    driver = webdriver.Firefox()
-    driver.get(url)
-    if "agecheck" in driver.current_url:
-        driver.find_element_by_xpath("//select[@name='ageYear']/option[text()='1990']").click()
-        driver.find_element_by_class_name("btnv6_blue_hoverfade").click()
-    html = driver.page_source
-    driver.close()
+        # get tags
+        soup = BS.BeautifulSoup(html)
+        script_results = soup('script', {'type': 'text/javascript'})
+        tag = script_results[26]
+        tag_string = tag.string
+        tags = tag_string[tag_string.index("["):tag_string.index(",", tag_string.index("]"))]
+        data = json.loads(tags)
+        self.tags = [x["name"] for x in data]
 
-    soup = BS.BeautifulSoup(html)
-    result = soup.find("div", id="game_area_metascore").text
-    return result[:result.find("/")]
+        # get metascore
+        result = soup.find("div", id="game_area_metascore").text
+        self.metascore = result[:result.find("/")]
 
-
-def getReviews(game):
-    url = "http://store.steampowered.com/app/" + str(game[1])
-
-    driver = webdriver.Firefox()
-    driver.get(url)
-    if "agecheck" in driver.current_url:
-        driver.find_element_by_xpath("//select[@name='ageYear']/option[text()='1990']").click()
-        driver.find_element_by_class_name("btnv6_blue_hoverfade").click()
-    html = driver.page_source
-    driver.close()
-
-    soup = BS.BeautifulSoup(html)
-    votes = str(soup.find(id="ReviewsTab_positive"))
-    positive = votes[votes.find('t">')+4:votes.find(")</")]
-
-    votes = str(soup.find(id="ReviewsTab_negative"))
-    negative = votes[votes.find('t">')+4:votes.find(")</")]
-    return positive, negative
-
-
-games = getMatchingGames(["alexishbob2", "q1w2e3286"])
-
-games.sort()
-
-getReviews(games[5])
+        # get review count
+        votes = str(soup.find(id="ReviewsTab_positive"))
+        positive = votes[votes.find('t">')+4:votes.find(")</")]
+        votes = str(soup.find(id="ReviewsTab_negative"))
+        negative = votes[votes.find('t">')+4:votes.find(")</")]
+        self.reviews = (positive, negative)
