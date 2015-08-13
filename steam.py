@@ -2,6 +2,7 @@ import urllib2 as urllib
 import json
 import xml.etree.ElementTree as ET
 import BeautifulSoup as BS
+
 from selenium import webdriver
 
 
@@ -9,11 +10,7 @@ class User:
 
     def __init__(self, name):
         #check if username or ID
-        try:
-            int(name)
-            self.name = name
-        except ValueError:
-            self.name = self._getID(name)
+        self.name = self._get_id(str(name))
 
         self.games = []
         self.friends = []
@@ -47,21 +44,30 @@ class User:
         return games
 
     # TODO: fix this
-    def _getID(self, username):
-        if "steamcommunity.com" in username:
-            url = username
-            if "http://" not in username:
-                url = "http://" + url
-            if "www." not in username:
-                url = "www." + url
-            if "?xml=1" not in username:
-                url += "?xml=1"
-        else:
-            url = "http://www.steamcommunity.com/id/" + username + "?xml=1"
-        response = urllib.urlopen(url)
-        tree = ET.parse(response)
-        root = tree.getroot()
-        return root[0].text
+    def _get_id(self, username):
+        try:
+            assert len(username) >= 16
+            int(username)
+            return username
+        except (AssertionError, ValueError):
+            if "steamcommunity.com" in username:
+                url = username
+                if "www." not in username:
+                    url = "www." + url
+                if "http://" not in username:
+                    url = "http://" + url
+                if "?xml=1" not in username:
+                    url += "?xml=1"
+            else:
+                url = "http://www.steamcommunity.com/id/" + username + "?xml=1"
+            response = urllib.urlopen(url)
+            tree = ET.parse(response)
+            root = tree.getroot()
+            text = root[0].text
+            if text == "The specified profile could not be found.":
+                raise Exception("Profile not found")
+            else:
+                return text
 
 
 class Game:
@@ -108,3 +114,5 @@ class Game:
         votes = str(soup.find(id="ReviewsTab_negative"))
         negative = votes[votes.find('t">')+4:votes.find(")</")]
         self.reviews = (positive, negative)
+
+User(76561198032447319)
