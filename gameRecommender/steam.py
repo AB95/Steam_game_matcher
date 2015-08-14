@@ -125,4 +125,4 @@ class Game:
 if __name__ == "__main__":
     # tests go here
     game = User(76561198032447319).get_games()[0]
-    game.getDetails()
+    game.get_details()
