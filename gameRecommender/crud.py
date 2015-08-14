@@ -47,14 +47,10 @@ def add_game_db(game_object):
         return "game is already in the DB"
 
     else:
-        if game_object.metascore == 'N':
-            print(game_object.metascore)
-            game_object.metascore = None
-            print(game_object.metascore)
 
         new_game = GameInfo(game_name=game_object.name, app_ID=game_object.appid, metascore=game_object.metascore,
-                            positive_review_numbers=int(game_object.reviews[0].replace(',', '')),
-                            negative_review_numbers=int(game_object.reviews[1].replace(',', '')),
+                            positive_review_numbers=game_object.positive_reviews,
+                            negative_review_numbers=game_object.negative_reviews,
                             picture=game_object.image_url,)
         new_game.save()
 

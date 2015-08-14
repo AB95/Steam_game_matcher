@@ -113,7 +113,7 @@ class Game:
             int(score)
             self.metascore = score
         except ValueError:
-            self.metascore = 0
+            self.metascore = None
 
         # get review count
         votes = str(soup.find(id="ReviewsTab_positive"))
