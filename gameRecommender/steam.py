@@ -25,7 +25,7 @@ class User:
         data = json.loads(response.read())
 
         for i in data["response"]["games"]:
-            self.games.append(Game(i["appid"], i["img_icon_url"], i["name"], i["playtime_forever"]))
+            self.games.append(Game(i["appid"], i["img_logo_url"], i["name"], i["playtime_forever"]))
 
         return self.games
 
@@ -80,7 +80,9 @@ class Game:
 
     def __init__(self, appid, image_url, name, playtime):
         self.appid = int(appid)
-        self.image_url = image_url
+        self.image_url = \
+            "http://media.steampowered.com/steamcommunity/public/images/apps/" + str(appid) + \
+            "/" + image_url + ".jpg"
         self.name = name
         self.playtime = int(playtime)
 
@@ -96,11 +98,11 @@ class Game:
             crud.add_game_db(self)
         else:
             game_info = crud.get_game_info(appid)
-            self.tags = game_info.gameTags
+            self.tags = [i["tags"] for i in game_info.gameTags.filter().values("tags")]
             self.metascore = game_info.metascore
             self.positive_reviews = game_info.positive_review_numbers
             self.negative_reviews = game_info.negative_review_numbers
-            self.features = game_info.gameFeatures
+            self.features = [i["features"] for i in game_info.gameFeatures.filter().values("features")]
 
     def _get_details(self):
         self._scrape_details()
