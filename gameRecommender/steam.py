@@ -120,7 +120,6 @@ class Game:
         # get features
         result2 = soup.findAll("a", {"class": "name"})
         self.features = [i.string for i in result2]
-        self.features
 
 
 if __name__ == "__main__":
