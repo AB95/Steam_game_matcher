@@ -3,7 +3,10 @@ import json
 import xml.etree.ElementTree as et
 import BeautifulSoup as bs
 
+import django
 from selenium import webdriver
+
+import crud
 
 
 class User:
@@ -81,7 +84,25 @@ class Game:
         self.name = name
         self.playtime = int(playtime)
 
-    def get_details(self):
+        # initialise to None in case game does not exist
+        self.tags = None
+        self.metascore = None
+        self.positive_reviews = None
+        self.negative_reviews = None
+        self.features = None
+
+        if not crud.game_in_db(self.appid):
+            self._get_details()
+            crud.add_game_db(self)
+        else:
+            game_info = crud.get_game_info(appid)
+            self.tags = game_info.gameTags
+            self.metascore = game_info.metascore
+            self.positive_reviews = game_info.positive_review_numbers
+            self.negative_reviews = game_info.negative_review_numbers
+            self.features = game_info.gameFeatures
+
+    def _get_details(self):
         self._scrape_details()
 
     def _scrape_details(self):
@@ -90,6 +111,11 @@ class Game:
         # use driver to generate full HTML
         driver = webdriver.Firefox()
         driver.get(url)
+
+        # make sure game exists
+        if driver.current_url == "http://store.steampowered.com/":
+            driver.close()
+            return
 
         # bypass agecheck if necessary
         if "agecheck" in driver.current_url:
@@ -107,12 +133,12 @@ class Game:
         self.tags = [x["name"] for x in data]
 
         # get metascore
-        result = soup.find("div", id="game_area_metascore").text
-        score = result[:result.find("/")]
         try:
+            result = soup.find("div", id="game_area_metascore").text
+            score = result[:result.find("/")]
             int(score)
             self.metascore = score
-        except ValueError:
+        except (ValueError, AttributeError):
             self.metascore = None
 
         # get review count
@@ -127,9 +153,22 @@ class Game:
         result2 = soup.findAll("a", {"class": "name"})
         self.features = [i.string for i in result2]
 
+    def print_game(self):
+        print "appid:", self.appid
+        print "image URL:", self.image_url
+        print "name:", self.name
+        print "playtime:", self.playtime
+        print "tags:", self.tags
+        print "metascore:", self.metascore
+        print "positive review count:", self.positive_reviews
+        print "negative review count:", self.negative_reviews
+        print "features:", self.features
+
 
 if __name__ == "__main__":
     # tests go here
-    game = User(76561198032447319).get_games()[0]
-    game.get_details()
+    django.setup()
+    game = User(76561198189868938).get_games()[1]
+    game.print_game()
+
 

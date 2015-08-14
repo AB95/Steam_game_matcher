@@ -46,6 +46,10 @@ def add_game_db(game_object):
 
         return "game is already in the DB"
 
+    elif game_object.tags is None and game_object is None:
+
+        return "game has no tags or features"
+
     else:
 
         new_game = GameInfo(game_name=game_object.name, app_ID=game_object.appid, metascore=game_object.metascore,
@@ -54,20 +58,21 @@ def add_game_db(game_object):
                             picture=game_object.image_url,)
         new_game.save()
 
-        for item in game_object.tags:
-            print(item)
-            if not check_tag(item):
-                add_tag(item)
-                new_game.gameTags.add(get_tag(item))
-            else:
-                new_game.gameTags.add(get_tag(item))
+        if game_object.tags:
+            for item in game_object.tags:
+                if not check_tag(item):
+                    add_tag(item)
+                    new_game.gameTags.add(get_tag(item))
+                else:
+                    new_game.gameTags.add(get_tag(item))
 
-        for item in game_object.features:
-            if not check_feature(item):
-                add_feature(item)
-                new_game.gameFeatures.add(get_feature(item))
-            else:
-                new_game.gameFeatures.add(get_feature(item))
+        if game_object.features:
+            for item in game_object.features:
+                if not check_feature(item):
+                    add_feature(item)
+                    new_game.gameFeatures.add(get_feature(item))
+                else:
+                    new_game.gameFeatures.add(get_feature(item))
 
         new_game.save()
 
