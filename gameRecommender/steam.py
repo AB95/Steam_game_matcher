@@ -76,7 +76,7 @@ class User:
 class Game:
 
     def __init__(self, appid, image_url, name, playtime):
-        self.appid = appid
+        self.appid = int(appid)
         self.image_url = image_url
         self.name = name
         self.playtime = int(playtime)
@@ -108,14 +108,20 @@ class Game:
 
         # get metascore
         result = soup.find("div", id="game_area_metascore").text
-        self.metascore = result[:result.find("/")]
+        score = result[:result.find("/")]
+        try:
+            int(score)
+            self.metascore = score
+        except ValueError:
+            self.metascore = 0
 
         # get review count
         votes = str(soup.find(id="ReviewsTab_positive"))
         positive = votes[votes.find('t">')+4:votes.find(")</")]
         votes = str(soup.find(id="ReviewsTab_negative"))
         negative = votes[votes.find('t">')+4:votes.find(")</")]
-        self.reviews = (positive, negative)
+        self.positive_reviews = int(positive.replace(",", ""))
+        self.negative_reviews = int(negative.replace(",", ""))
 
         # get features
         result2 = soup.findAll("a", {"class": "name"})
@@ -126,3 +132,4 @@ if __name__ == "__main__":
     # tests go here
     game = User(76561198032447319).get_games()[0]
     game.get_details()
+
