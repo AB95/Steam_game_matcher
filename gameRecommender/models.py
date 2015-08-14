@@ -23,8 +23,8 @@ class GameInfo(models.Model):
     positive_review_numbers = models.PositiveIntegerField()
     negative_review_numbers = models.PositiveIntegerField()
     picture = models.URLField()
-    gameTags = models.ManyToManyField(GameTags)
-    gameFeatures = models.ManyToManyField(GameFeatures)
+    gameTags = models.ManyToManyField(GameTags, null=True, blank=True)
+    gameFeatures = models.ManyToManyField(GameFeatures, null=True, blank=True)
 
     class Meta:
         ordering = ('app_ID',)
