@@ -24,6 +24,8 @@ class User:
         for i in data["response"]["games"]:
             self.games.append(Game(i["appid"], i["img_icon_url"], i["name"], i["playtime_forever"]))
 
+        return self.games
+
     def get_friends(self):
         url = "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=E770C55138B535447F8678136EFC9285&steamid=" + \
               self.name + "&relationship=friend"
@@ -32,6 +34,8 @@ class User:
 
         for i in data["friendslist"]["friends"]:
             self.friends.append(User(i["steamid"]))
+
+        return self.friends
 
     def get_matching_games(self, users):
 
@@ -43,7 +47,6 @@ class User:
 
         return games
 
-    # TODO: fix this
     def _get_id(self, username):
         try:
             assert len(username) >= 16
@@ -82,7 +85,7 @@ class Game:
         self._scrape_details()
 
     def _scrape_details(self):
-        url = "http://store.steampowered.com/app/" + self.appid
+        url = "http://store.steampowered.com/app/" + str(self.appid)
 
         # use driver to generate full HTML
         driver = webdriver.Firefox()
@@ -97,9 +100,8 @@ class Game:
 
         # get tags
         soup = BS.BeautifulSoup(html)
-        script_results = soup('script', {'type': 'text/javascript'})
-        tag = script_results[26]
-        tag_string = tag.string
+        script_results = [i for i in soup('script', {'type': 'text/javascript'}) if "InitAppTagModal" in str(i)][0]
+        tag_string = script_results.string
         tags = tag_string[tag_string.index("["):tag_string.index(",", tag_string.index("]"))]
         data = json.loads(tags)
         self.tags = [x["name"] for x in data]
@@ -115,6 +117,13 @@ class Game:
         negative = votes[votes.find('t">')+4:votes.find(")</")]
         self.reviews = (positive, negative)
 
+        #get features
+        result2 = soup.findAll("a", {"class": "name"})
+        self.features = [i.string for i in result2]
+        self.features
+
+
 if __name__ == "__main__":
     # tests go here
-    User(76561198032447319)
+    game = User(76561198032447319).get_games()[0]
+    game.getDetails()
