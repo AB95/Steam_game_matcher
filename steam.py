@@ -115,4 +115,6 @@ class Game:
         negative = votes[votes.find('t">')+4:votes.find(")</")]
         self.reviews = (positive, negative)
 
-User(76561198032447319)
+if __name__ == "__main__":
+    # tests go here
+    User(76561198032447319)
