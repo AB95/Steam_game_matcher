@@ -1,7 +1,7 @@
 import urllib2 as urllib
 import json
-import xml.etree.ElementTree as ET
-import BeautifulSoup as BS
+import xml.etree.ElementTree as et
+import BeautifulSoup as bs
 
 from selenium import webdriver
 
@@ -9,7 +9,7 @@ from selenium import webdriver
 class User:
 
     def __init__(self, name):
-        #check if username or ID
+        # check if username or ID
         self.name = self._get_id(str(name))
 
         self.games = []
@@ -64,7 +64,7 @@ class User:
             else:
                 url = "http://www.steamcommunity.com/id/" + username + "?xml=1"
             response = urllib.urlopen(url)
-            tree = ET.parse(response)
+            tree = et.parse(response)
             root = tree.getroot()
             text = root[0].text
             if text == "The specified profile could not be found.":
@@ -75,13 +75,13 @@ class User:
 
 class Game:
 
-    def __init__(self, appid, imageURL, name, playtime):
+    def __init__(self, appid, image_url, name, playtime):
         self.appid = appid
-        self.imageURL = imageURL
+        self.image_url = image_url
         self.name = name
         self.playtime = int(playtime)
 
-    def getDetails(self):
+    def get_details(self):
         self._scrape_details()
 
     def _scrape_details(self):
@@ -99,7 +99,7 @@ class Game:
         driver.close()
 
         # get tags
-        soup = BS.BeautifulSoup(html)
+        soup = bs.BeautifulSoup(html)
         script_results = [i for i in soup('script', {'type': 'text/javascript'}) if "InitAppTagModal" in str(i)][0]
         tag_string = script_results.string
         tags = tag_string[tag_string.index("["):tag_string.index(",", tag_string.index("]"))]
@@ -117,7 +117,7 @@ class Game:
         negative = votes[votes.find('t">')+4:votes.find(")</")]
         self.reviews = (positive, negative)
 
-        #get features
+        # get features
         result2 = soup.findAll("a", {"class": "name"})
         self.features = [i.string for i in result2]
         self.features
