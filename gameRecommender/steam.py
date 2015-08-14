@@ -40,7 +40,7 @@ class User:
 
         return self.friends
 
-    def get_matching_games(self, users):
+    def get_matching_games(self, users, tags=None):
 
         games = self.games
 
@@ -48,7 +48,13 @@ class User:
             if i.name != self.name:
                 games = [x for x in games if x in i.games]
 
-        return games
+        if tags is None:
+            return games
+        else:
+            return [i for i in games if i.has_tags(tags)]
+
+    def get_games_with_tags(self, tags):
+        return [i for i in self.games if i.has_tags(tags)]
 
     def _get_id(self, username):
         try:
@@ -165,6 +171,12 @@ class Game:
         print "positive review count:", self.positive_reviews
         print "negative review count:", self.negative_reviews
         print "features:", self.features
+
+    def has_tags(self, tags):
+        for i in tags:
+            if i not in self.tags:
+                return False
+        return True
 
 
 if __name__ == "__main__":
