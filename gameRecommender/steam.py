@@ -4,7 +4,7 @@ import xml.etree.ElementTree as et
 import BeautifulSoup as bs
 
 import django
-from selenium import webdriver
+import dryscrape
 
 import crud
 
@@ -117,23 +117,21 @@ class Game:
         url = "http://store.steampowered.com/app/" + str(self.appid)
 
         # use driver to generate full HTML
-        driver = webdriver.Firefox()
-        driver.get(url)
+        sess = dryscrape.Session()
+        sess.visit(url)
 
         # make sure game exists
-        if driver.current_url == "http://store.steampowered.com/":
-            driver.close()
+        if sess.url() == "http://store.steampowered.com/":
             return
 
         # bypass agecheck if necessary
-        if "agecheck" in driver.current_url:
-            driver.find_element_by_xpath("//select[@name='ageYear']/option[text()='1990']").click()
-            driver.find_element_by_class_name("btnv6_blue_hoverfade").click()
-        html = driver.page_source
-        driver.close()
+        if "agecheck" in sess.url():
+            q = sess.at_xpath('//*[@name="ageYear"]')
+            q.set("1990")
+            q.form().submit()
 
         # get tags
-        soup = bs.BeautifulSoup(html)
+        soup = bs.BeautifulSoup(sess.body())
         script_results = [i for i in soup('script', {'type': 'text/javascript'}) if "InitAppTagModal" in str(i)][0]
         tag_string = script_results.string
         tags = tag_string[tag_string.index("["):tag_string.index(",", tag_string.index("]"))]
