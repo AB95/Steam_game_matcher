@@ -184,5 +184,3 @@ if __name__ == "__main__":
     django.setup()
     game = User(76561198189868938).get_games()[1]
     game.print_game()
-
-

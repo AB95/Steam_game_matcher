@@ -19,7 +19,7 @@ def get_game_info(game_id):
         return game
 
     else:
-        return "Game is not in the database"
+        raise Exception("Game not in DB")
 
 
 def get_tag(tag_check):
@@ -28,7 +28,7 @@ def get_tag(tag_check):
         tag = GameTags.objects.get(tags=tag_check)
         return tag
     else:
-        return "no tag found"
+        raise Exception("Tag not in DB")
 
 
 def get_feature(feature_check):
@@ -37,18 +37,14 @@ def get_feature(feature_check):
         feature = GameFeatures.objects.get(features=feature_check)
         return feature
     else:
-        return "no feature found"
+        raise Exception("Feature not in DB")
 
 
 def add_game_db(game_object):
 
     if game_in_db(game_object.appid):
 
-        return "game is already in the DB"
-
-    elif game_object.tags is None and game_object is None:
-
-        return "game has no tags or features"
+        raise Exception("Game is already in the DB")
 
     else:
 
