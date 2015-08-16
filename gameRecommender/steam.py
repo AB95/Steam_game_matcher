@@ -2,7 +2,6 @@ import urllib2 as urllib
 import json
 import xml.etree.ElementTree as et
 import BeautifulSoup as bs
-import thread
 
 import django
 import mechanize
@@ -17,7 +16,6 @@ class User:
         # check if username or ID
         self.name = self._get_id(str(name))
 
-        self.games_total = 0
         self.games = []
         self.friends = []
 
@@ -32,17 +30,11 @@ class User:
         self.games_total = data["response"]["game_count"]
 
         for i in data["response"]["games"]:
-            thread.start_new_thread(self.add_game, (i, ))
-
-        while len(self.games) < self.games_total:
-            if len(self.games) > counter:
-                counter = len(self.games)
-                print str(counter) + "/" + str(self.games_total)
+            self.games.append(Game(i["appid"], i["img_logo_url"], i["name"], i["playtime_forever"]))
+            counter += 1
+            print counter
 
         return self.games
-
-    def add_game(self, i):
-        self.games.append(Game(i["appid"], i["img_logo_url"], i["name"], i["playtime_forever"]))
 
     def get_friends(self):
         url = "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=E770C55138B535447F8678136EFC9285&steamid=" + \
