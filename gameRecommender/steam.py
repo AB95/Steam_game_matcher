@@ -94,7 +94,7 @@ class User:
 
 class Game:
 
-    def __init__(self, appid, image_url, name, playtime):
+    def __init__(self, appid, image_url, name):
         # Initialise known values
         self.appid = int(appid)
         self.image_url = \
@@ -132,6 +132,14 @@ class Game:
         # Use driver to generate full HTML
         br = mechanize.Browser()
         response = br.open(url)
+
+        # Make sure 503 code not received. Checking the code can throw an error sometimes, but not with a 503,
+        # and so can be effectively silenced
+        try:
+            if response.code == 503:
+                self._scrape_details()
+        except:
+            pass
 
         # Make sure game exists
         if response.geturl() == "http://store.steampowered.com/":
@@ -214,6 +222,11 @@ if __name__ == "__main__":
     django.setup()
     user = User(76561198189868938)
     games_list = user.get_games()
+
+    for i in games_list.keys():
+        print i.name, games_list[i]
+        i.print_game()
+        print "===================================="
 
     # 76561198032447319 Bouch
     # 76561198021143995 Matt
