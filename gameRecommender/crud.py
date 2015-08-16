@@ -54,7 +54,7 @@ def add_game_db(game_object):
         new_game = GameInfo(game_name=game_object.name, app_ID=game_object.appid, metascore=game_object.metascore,
                             positive_review_numbers=game_object.positive_reviews,
                             negative_review_numbers=game_object.negative_reviews,
-                            picture=game_object.image_url,)
+                            picture=game_object.image_url, store_page=game_object.store_url)
         new_game.save()
 
         if game_object.tags:

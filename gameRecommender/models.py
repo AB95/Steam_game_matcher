@@ -23,6 +23,7 @@ class GameInfo(models.Model):
     positive_review_numbers = models.PositiveIntegerField(null=True, blank=True)
     negative_review_numbers = models.PositiveIntegerField(null=True, blank=True)
     picture = models.URLField(null=True, blank=True)
+    store_page = models.URLField(null=True, blank=True)
     gameTags = models.ManyToManyField(GameTags, null=True, blank=True)
     gameFeatures = models.ManyToManyField(GameFeatures, null=True, blank=True)
 

@@ -118,8 +118,6 @@ class Game:
     def _get_details(self):
         if not crud.game_in_db(self.appid):
             self._scrape_details()
-            self.print_game()
-            print "======================================="
             crud.add_game_db(self)
         else:
             game_info = crud.get_game_info(self.appid)
