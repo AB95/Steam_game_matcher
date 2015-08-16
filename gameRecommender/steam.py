@@ -117,7 +117,7 @@ class Game:
     # Checks if game is in the database, otherwise scrapes the web for the data
     def _get_details(self):
         if not crud.game_in_db(self.appid):
-            self._get_details()
+            self._scrape_details()
             crud.add_game_db(self)
         else:
             game_info = crud.get_game_info(self.appid)
@@ -202,6 +202,7 @@ class Game:
         print "positive review count:", self.positive_reviews
         print "negative review count:", self.negative_reviews
         print "features:", self.features
+        print "Store URL:", self.store_url
 
     # Made above list comprehensions easier to reason
     def has_tags(self, tags):
@@ -214,8 +215,11 @@ class Game:
 if __name__ == "__main__":
     # tests go here
     django.setup()
-    user = User(76561198021143995)
+    user = User(76561198189868938)
     games_list = user.get_games()
+
+    for j in games_list:
+        j.print_game()
 
     # 76561198032447319 Bouch
     # 76561198021143995 Matt
