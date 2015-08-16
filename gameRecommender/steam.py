@@ -1,13 +1,13 @@
 import urllib2 as urllib
 import json
 import xml.etree.ElementTree as et
-
 import BeautifulSoup as bs
 
 import django
 import mechanize
 
 import crud
+import errors
 
 
 class User:
@@ -25,8 +25,14 @@ class User:
         response = urllib.urlopen(url)
         data = json.loads(response.read())
 
+        counter = 0
+
+        self.games_total = data["response"]["game_count"]
+
         for i in data["response"]["games"]:
             self.games.append(Game(i["appid"], i["img_logo_url"], i["name"], i["playtime_forever"]))
+            counter += 1
+            print counter
 
         return self.games
 
@@ -134,11 +140,33 @@ class Game:
 
         # get tags
         soup = bs.BeautifulSoup(response.read())
-        script_results = [i for i in soup('script', {'type': 'text/javascript'}) if "InitAppTagModal" in str(i)][0]
-        tag_string = script_results.string
-        tags = tag_string[tag_string.index("["):tag_string.index(",", tag_string.index("]"))]
-        data = json.loads(tags)
-        self.tags = [x["name"] for x in data]
+
+        if soup.title.string == "Site Error":
+            print "Site Error:", self.appid, self.name
+            return
+
+        try:
+            script_results = [i for i in soup('script', {'type': 'text/javascript'}) if "InitAppTagModal" in str(i)][0]
+            tag_string = script_results.string
+            tags = tag_string[tag_string.index("["):tag_string.index(",", tag_string.index("]"))]
+            data = json.loads(tags)
+            self.tags = [x["name"] for x in data]
+
+            # get review count
+            votes = str(soup.find(id="ReviewsTab_positive"))
+            positive = votes[votes.find('t">')+4:votes.find(")</")]
+            votes = str(soup.find(id="ReviewsTab_negative"))
+            negative = votes[votes.find('t">')+4:votes.find(")</")]
+            self.positive_reviews = int(positive.replace(",", ""))
+            self.negative_reviews = int(negative.replace(",", ""))
+
+            # get features
+            result2 = soup.findAll("a", {"class": "name"})
+            self.features = [i.string for i in result2]
+        except IndexError:
+            print "Index error:", (str(self.appid) + " " + self.name)
+        except errors.AlreadyInDatabaseException:
+            self._get_details()
 
         # get metascore
         try:
@@ -149,17 +177,6 @@ class Game:
         except (ValueError, AttributeError):
             self.metascore = None
 
-        # get review count
-        votes = str(soup.find(id="ReviewsTab_positive"))
-        positive = votes[votes.find('t">')+4:votes.find(")</")]
-        votes = str(soup.find(id="ReviewsTab_negative"))
-        negative = votes[votes.find('t">')+4:votes.find(")</")]
-        self.positive_reviews = int(positive.replace(",", ""))
-        self.negative_reviews = int(negative.replace(",", ""))
-
-        # get features
-        result2 = soup.findAll("a", {"class": "name"})
-        self.features = [i.string for i in result2]
 
     def print_game(self):
         print "appid:", self.appid
@@ -182,5 +199,15 @@ class Game:
 if __name__ == "__main__":
     # tests go here
     django.setup()
-    game = User(76561198189868938).get_games()[1]
-    game.print_game()
+    user = User(76561198021143995)
+    games = user.get_games()
+
+    # 76561198032447319 Bouch
+    # 76561198021143995 Matt
+
+    for i in xrange(20):
+        games[i].print_game()
+        print
+        print "----------------------------"
+        print
+

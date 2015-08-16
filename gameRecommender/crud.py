@@ -1,6 +1,9 @@
 __author__ = 'Dean'
 
+from django.db import IntegrityError
+
 from gameRecommender.models import GameInfo, GameTags, GameFeatures
+import errors
 
 
 def game_in_db(game_id):
@@ -19,7 +22,7 @@ def get_game_info(game_id):
         return game
 
     else:
-        raise Exception("Game not in DB")
+        raise errors.NotInDatabaseException("Game not in DB")
 
 
 def get_tag(tag_check):
@@ -28,7 +31,7 @@ def get_tag(tag_check):
         tag = GameTags.objects.get(tags=tag_check)
         return tag
     else:
-        raise Exception("Tag not in DB")
+        raise errors.NotInDatabaseException("Tag not in DB")
 
 
 def get_feature(feature_check):
@@ -37,14 +40,14 @@ def get_feature(feature_check):
         feature = GameFeatures.objects.get(features=feature_check)
         return feature
     else:
-        raise Exception("Feature not in DB")
+        raise errors.NotInDatabaseException("Feature not in DB")
 
 
 def add_game_db(game_object):
 
     if game_in_db(game_object.appid):
 
-        raise Exception("Game is already in the DB")
+        raise errors.AlreadyInDatabaseException(game_object)
 
     else:
 
@@ -91,14 +94,20 @@ def check_feature(feature):
 
 def add_tag(tag):
 
-    new_tag = GameTags.objects.create(tags=tag)
-    new_tag.save()
+    try:
+        new_tag = GameTags.objects.create(tags=tag)
+        new_tag.save()
+    except IntegrityError:
+        pass
 
 
 def add_feature(feature):
 
-    new_feature = GameFeatures.objects.create(features=feature)
-    new_feature.save()
+    try:
+        new_feature = GameFeatures.objects.create(features=feature)
+        new_feature.save()
+    except IntegrityError:
+        pass
 
 
 def purge_db():
