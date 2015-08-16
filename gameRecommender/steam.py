@@ -15,10 +15,8 @@ class User:
     def __init__(self, name):
         # check if username or ID
         self.name = self._get_id(str(name))
-
-        self.game_dict = {}
         self.games_total = 0
-        self.games = []
+        self.games = {}
         self.friends = []
 
     def get_games(self):
@@ -32,7 +30,7 @@ class User:
 
         # Parse the json, turn it into a Game object and add it to the user's game list
         for i in data["response"]["games"]:
-            self.games.append(Game(i["appid"], i["img_logo_url"], i["name"], i["playtime_forever"]))
+            self.games[(Game(i["appid"], i["img_logo_url"], i["name"]))] = int(i["playtime_forever"])
 
         return self.games
 
@@ -52,11 +50,11 @@ class User:
     # If a list of tags is passed in as the optional argument, it only returns games with those tags
     def get_matching_games(self, users, tags=None):
 
-        games = self.games
+        games = self.games.keys()
 
         for i in users:
             if i.name != self.name:
-                games = [x for x in games if x in i.games]
+                games = [x for x in games if x in i.games.keys()]
 
         if tags is None:
             return games
@@ -65,7 +63,7 @@ class User:
 
     # Takes in a list of tags and returns only games the user owns with those tags
     def get_games_with_tags(self, tags):
-        return [i for i in self.games if i.has_tags(tags)]
+        return [i for i in self.games.keys() if i.has_tags(tags)]
 
     # Determines whether the user's ID or vanity URL was passed in and fetches the ID if it was a vanity URL
     def _get_id(self, username):
@@ -103,7 +101,6 @@ class Game:
             "http://media.steampowered.com/steamcommunity/public/images/apps/" + str(appid) + \
             "/" + image_url + ".jpg"
         self.name = name
-        self.playtime = int(playtime)
 
         # Initialise to None in case game does not exist
         self.tags = None
@@ -197,7 +194,6 @@ class Game:
         print "appid:", self.appid
         print "image URL:", self.image_url
         print "name:", self.name
-        print "playtime:", self.playtime
         print "tags:", self.tags
         print "metascore:", self.metascore
         print "positive review count:", self.positive_reviews
