@@ -16,6 +16,7 @@ class User:
         # check if username or ID
         self.name = self._get_id(str(name))
 
+        self.games_total = 0
         self.games = []
         self.friends = []
 
@@ -177,7 +178,6 @@ class Game:
         except (ValueError, AttributeError):
             self.metascore = None
 
-
     def print_game(self):
         print "appid:", self.appid
         print "image URL:", self.image_url
@@ -200,14 +200,13 @@ if __name__ == "__main__":
     # tests go here
     django.setup()
     user = User(76561198021143995)
-    games = user.get_games()
+    games_list = user.get_games()
 
     # 76561198032447319 Bouch
     # 76561198021143995 Matt
 
-    for i in xrange(20):
-        games[i].print_game()
+    for j in xrange(20):
+        games_list[j].print_game()
         print
         print "----------------------------"
         print
-
