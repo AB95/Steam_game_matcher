@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'steamProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'steamDB',
+        'NAME': 'steamdb',
         'USER': 'steam',
         'PASSWORD': 'qazwsx286',
         'HOST': 'localhost',
