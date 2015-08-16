@@ -99,3 +99,14 @@ def add_feature(feature):
 
     new_feature = GameFeatures.objects.create(features=feature)
     new_feature.save()
+
+
+def purge_db():
+    for item in GameInfo.objects.filter():
+        item.delete()
+
+    for item in GameFeatures.objects.filter():
+        item.delete()
+
+    for item in GameTags.objects.filter():
+        item.delete()
