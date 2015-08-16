@@ -16,6 +16,7 @@ class User:
         # check if username or ID
         self.name = self._get_id(str(name))
 
+        self.game_dict = {}
         self.games_total = 0
         self.games = []
         self.friends = []
