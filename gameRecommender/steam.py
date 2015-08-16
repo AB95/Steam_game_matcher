@@ -1,10 +1,11 @@
 import urllib2 as urllib
 import json
 import xml.etree.ElementTree as et
+
 import BeautifulSoup as bs
 
 import django
-import dryscrape
+import mechanize
 
 import crud
 
@@ -117,21 +118,22 @@ class Game:
         url = "http://store.steampowered.com/app/" + str(self.appid)
 
         # use driver to generate full HTML
-        sess = dryscrape.Session()
-        sess.visit(url)
+        br = mechanize.Browser()
+        response = br.open(url)
 
         # make sure game exists
-        if sess.url() == "http://store.steampowered.com/":
+        if response.geturl() == "http://store.steampowered.com/":
             return
 
         # bypass agecheck if necessary
-        if "agecheck" in sess.url():
-            q = sess.at_xpath('//*[@name="ageYear"]')
-            q.set("1990")
-            q.form().submit()
+        if "agecheck" in response.geturl():
+            br.form = list(br.forms())[1]
+            control = br.form.controls[3]
+            control.value = ["1990"]
+            response = br.submit()
 
         # get tags
-        soup = bs.BeautifulSoup(sess.body())
+        soup = bs.BeautifulSoup(response.read())
         script_results = [i for i in soup('script', {'type': 'text/javascript'}) if "InitAppTagModal" in str(i)][0]
         tag_string = script_results.string
         tags = tag_string[tag_string.index("["):tag_string.index(",", tag_string.index("]"))]
