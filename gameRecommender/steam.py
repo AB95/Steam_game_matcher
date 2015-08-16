@@ -21,22 +21,21 @@ class User:
         self.friends = []
 
     def get_games(self):
+        # Construct URL for the api then grab the json
         url = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=E770C55138B535447F8678136EFC9285&steamid=" + \
             self.name + "&format=json&include_played_free_games=1&include_appinfo=1"
         response = urllib.urlopen(url)
         data = json.loads(response.read())
 
-        counter = 0
-
         self.games_total = data["response"]["game_count"]
 
+        # Parse the json, turn it into a Game object and add it to the user's game list
         for i in data["response"]["games"]:
             self.games.append(Game(i["appid"], i["img_logo_url"], i["name"], i["playtime_forever"]))
-            counter += 1
-            print counter
 
         return self.games
 
+    # Grabs the user's friends list in the form of their Steam id's
     def get_friends(self):
         url = "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=E770C55138B535447F8678136EFC9285&steamid=" + \
               self.name + "&relationship=friend"
@@ -48,6 +47,8 @@ class User:
 
         return self.friends
 
+    # Takes in a list of users and returns all games they have in common
+    # If a list of tags is passed in as the optional argument, it only returns games with those tags
     def get_matching_games(self, users, tags=None):
 
         games = self.games
@@ -61,9 +62,11 @@ class User:
         else:
             return [i for i in games if i.has_tags(tags)]
 
+    # Takes in a list of tags and returns only games the user owns with those tags
     def get_games_with_tags(self, tags):
         return [i for i in self.games if i.has_tags(tags)]
 
+    # Determines whether the user's ID or vanity URL was passed in and fetches the ID if it was a vanity URL
     def _get_id(self, username):
         try:
             assert len(username) >= 16
@@ -93,6 +96,7 @@ class User:
 class Game:
 
     def __init__(self, appid, image_url, name, playtime):
+        # Initialise known values
         self.appid = int(appid)
         self.image_url = \
             "http://media.steampowered.com/steamcommunity/public/images/apps/" + str(appid) + \
@@ -100,60 +104,64 @@ class Game:
         self.name = name
         self.playtime = int(playtime)
 
-        # initialise to None in case game does not exist
+        # Initialise to None in case game does not exist
         self.tags = None
         self.metascore = None
         self.positive_reviews = None
         self.negative_reviews = None
         self.features = None
+        self.store_url = None
 
+        self._get_details()
+
+    # Checks if game is in the database, otherwise scrapes the web for the data
+    def _get_details(self):
         if not crud.game_in_db(self.appid):
             self._get_details()
             crud.add_game_db(self)
         else:
-            game_info = crud.get_game_info(appid)
+            game_info = crud.get_game_info(self.appid)
             self.tags = [i["tags"] for i in game_info.gameTags.filter().values("tags")]
             self.metascore = game_info.metascore
             self.positive_reviews = game_info.positive_review_numbers
             self.negative_reviews = game_info.negative_review_numbers
             self.features = [i["features"] for i in game_info.gameFeatures.filter().values("features")]
 
-    def _get_details(self):
-        self._scrape_details()
-
+    # Scrapes info from the game's site
     def _scrape_details(self):
         url = "http://store.steampowered.com/app/" + str(self.appid)
 
-        # use driver to generate full HTML
+        # Use driver to generate full HTML
         br = mechanize.Browser()
         response = br.open(url)
 
-        # make sure game exists
+        # Make sure game exists
         if response.geturl() == "http://store.steampowered.com/":
             return
 
-        # bypass agecheck if necessary
+        # Bypass agecheck if necessary
         if "agecheck" in response.geturl():
             br.form = list(br.forms())[1]
             control = br.form.controls[3]
             control.value = ["1990"]
             response = br.submit()
 
-        # get tags
+        # Parses the html using BeautifulSoup
         soup = bs.BeautifulSoup(response.read())
 
+        # Simple returns if a site error occurs
         if soup.title.string == "Site Error":
-            print "Site Error:", self.appid, self.name
             return
 
         try:
+            # Get tags
             script_results = [i for i in soup('script', {'type': 'text/javascript'}) if "InitAppTagModal" in str(i)][0]
             tag_string = script_results.string
             tags = tag_string[tag_string.index("["):tag_string.index(",", tag_string.index("]"))]
             data = json.loads(tags)
             self.tags = [x["name"] for x in data]
 
-            # get review count
+            # Get review count
             votes = str(soup.find(id="ReviewsTab_positive"))
             positive = votes[votes.find('t">')+4:votes.find(")</")]
             votes = str(soup.find(id="ReviewsTab_negative"))
@@ -161,22 +169,28 @@ class Game:
             self.positive_reviews = int(positive.replace(",", ""))
             self.negative_reviews = int(negative.replace(",", ""))
 
-            # get features
+            # Get features
             result2 = soup.findAll("a", {"class": "name"})
             self.features = [i.string for i in result2]
+        # Shows the game has no tags and therefore an error has occurred
         except IndexError:
-            print "Index error:", (str(self.appid) + " " + self.name)
+            pass
+        # Can occur with more than one user tries to access the database at once
         except errors.AlreadyInDatabaseException:
             self._get_details()
 
-        # get metascore
+        # Get metascore
         try:
             result = soup.find("div", id="game_area_metascore").text
             score = result[:result.find("/")]
             int(score)
             self.metascore = score
+        # Games without a metascore are labelled "N/A" on the site
         except (ValueError, AttributeError):
             self.metascore = None
+
+        # Down here so that if the store page doesn't exist, is set to None
+        self.store_url = url
 
     def print_game(self):
         print "appid:", self.appid
@@ -189,6 +203,7 @@ class Game:
         print "negative review count:", self.negative_reviews
         print "features:", self.features
 
+    # Made above list comprehensions easier to reason
     def has_tags(self, tags):
         for i in tags:
             if i not in self.tags:
@@ -204,9 +219,8 @@ if __name__ == "__main__":
 
     # 76561198032447319 Bouch
     # 76561198021143995 Matt
+    # 76561198018709098 Dan
+    # 76561198189868938 Squacks
 
-    for j in xrange(20):
-        games_list[j].print_game()
-        print
-        print "----------------------------"
-        print
+    # people with most games on Steam:
+    # 76561198000611224 76561198017902347 76561197971026489 76561197981142609 76561198026221141
