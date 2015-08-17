@@ -9,11 +9,11 @@ import errors
 
 class Game:
 
-    def __init__(self, appid, image_url, name):
+    def __init__(self, app_id, image_url, name):
         # Initialise known values
-        self.appid = int(appid)
+        self.app_id = int(app_id)
         self.image_url = \
-            "http://media.steampowered.com/steamcommunity/public/images/apps/" + str(appid) + \
+            "http://media.steampowered.com/steamcommunity/public/images/apps/" + str(app_id) + \
             "/" + image_url + ".jpg"
         self.name = name
 
@@ -28,18 +28,18 @@ class Game:
         self._get_details()
 
     def __eq__(self, other):
-        return self.appid == other.appid
+        return self.app_id == other.appid
 
     def __hash__(self):
-        return hash(self.appid)
+        return hash(self.app_id)
 
     # Checks if game is in the database, otherwise scrapes the web for the data
     def _get_details(self):
-        if not crud.game_in_db(self.appid):
+        if not crud.game_in_db(self.app_id):
             self._scrape_details()
             crud.add_game_db(self)
         else:
-            game_info = crud.get_game_info(self.appid)
+            game_info = crud.get_game_info(self.app_id)
             self.tags = [i["tags"] for i in game_info.gameTags.filter().values("tags")]
             self.metascore = game_info.metascore
             self.positive_reviews = game_info.positive_review_numbers
@@ -49,7 +49,7 @@ class Game:
 
     # Scrapes info from the game's site
     def _scrape_details(self):
-        url = "http://store.steampowered.com/app/" + str(self.appid)
+        url = "http://store.steampowered.com/app/" + str(self.app_id)
 
         # Use driver to generate full HTML
         br = mechanize.Browser()
@@ -118,7 +118,7 @@ class Game:
         self.store_url = url
 
     def print_game(self):
-        print "appid:", self.appid
+        print "appid:", self.app_id
         print "image URL:", self.image_url
         print "name:", self.name
         print "tags:", self.tags

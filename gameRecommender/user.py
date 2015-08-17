@@ -26,7 +26,7 @@ class User:
 
         # Parse the json, turn it into a Game object and add it to the user's game list
         for i in data["response"]["games"]:
-            self.games[(Game(i["appid"], i["img_logo_url"], i["name"]))] = int(i["playtime_forever"])
+            self.games[(Game(i["app_id"], i["img_logo_url"], i["name"]))] = int(i["playtime_forever"])
 
         return self.games
 
