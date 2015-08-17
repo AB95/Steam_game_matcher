@@ -13,6 +13,7 @@ class User:
         self.games_total = 0
         self.games = {}
         self.friends = []
+        self.get_games()
 
     def get_games(self):
         # Construct URL for the api then grab the json

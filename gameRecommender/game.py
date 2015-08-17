@@ -27,6 +27,12 @@ class Game:
 
         self._get_details()
 
+    def __eq__(self, other):
+        return self.appid == other.appid
+
+    def __hash__(self):
+        return hash(self.appid)
+
     # Checks if game is in the database, otherwise scrapes the web for the data
     def _get_details(self):
         if not crud.game_in_db(self.appid):
