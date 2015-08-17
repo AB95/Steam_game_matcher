@@ -41,21 +41,6 @@ class User:
 
         return self.friends
 
-    # Takes in a list of users and returns all games they have in common
-    # If a list of tags is passed in as the optional argument, it only returns games with those tags
-    def get_matching_games(self, users, tags=None):
-
-        games = self.games.keys()
-
-        for i in users:
-            if i.name != self.name:
-                games = [x for x in games if x in i.games.keys()]
-
-        if tags is None:
-            return games
-        else:
-            return [i for i in games if i.has_tags(tags)]
-
     # Takes in a list of tags and returns only games the user owns with those tags
     def get_games_with_tags(self, tags):
         return [i for i in self.games.keys() if i.has_tags(tags)]
