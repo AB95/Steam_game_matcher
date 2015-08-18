@@ -28,7 +28,7 @@ class Game:
         self._get_details()
 
     def __eq__(self, other):
-        return self.app_id == other.appid
+        return self.app_id == other.app_id
 
     def __hash__(self):
         return hash(self.app_id)

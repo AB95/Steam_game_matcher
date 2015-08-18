@@ -45,7 +45,7 @@ def get_feature(feature_check):
 
 def add_game_db(game_object):
 
-    if game_in_db(game_object.appid):
+    if game_in_db(game_object.app_id):
 
         raise errors.AlreadyInDatabaseException(game_object)
 
