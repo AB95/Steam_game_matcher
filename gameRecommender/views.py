@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django_tables2 import RequestConfig
+from errors import ProfileNotFoundException
 import user
 import utils
 from .models import GameInfo
@@ -17,16 +18,16 @@ def index(request):
         try:
             user_list = [user.User(user_id_1), user.User(user_id_2)]
             request.session['user_list'] = user_list
-        except Exception:
+        except ProfileNotFoundException:
             try:
                 user_list = request.session['user_list']
-            except Exception:
+            except ProfileNotFoundException:
                 user_list = []
 
     else:
         try:
             user_list = request.session['user_list']
-        except Exception:
+        except ProfileNotFoundException:
             user_list = []
 
     table = make_table(user_list)
