@@ -2,6 +2,7 @@ import urllib2 as urllib
 import json
 import xml.etree.ElementTree as et
 
+from errors import ProfileNotFoundException
 from game import Game
 
 
@@ -68,6 +69,6 @@ class User:
             root = tree.getroot()
             text = root[0].text
             if text == "The specified profile could not be found.":
-                raise Exception("Profile not found")
+                raise ProfileNotFoundException(username)
             else:
                 return text
