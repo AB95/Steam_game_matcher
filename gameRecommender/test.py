@@ -16,7 +16,10 @@ if __name__ == "__main__":
     #     print "===================================="
 
     django.setup()
+    import time
+    start = time.time()
     print [i.name for i in utils.get_matching_games([User(76561198032447319), User(76561198018709098), User(76561198189868938)])]
+    print time.time() - start
 
     # 76561198032447319 Bouch
     # 76561198021143995 Matt

@@ -5,10 +5,11 @@
 def get_matching_games(users, tags=None):
     users = list(set(users))
 
-    games = users[0].games.keys()
+    games = set(users[0].games)
 
-    for i in users:
-        games = [x for x in games if x in i.games.keys()]
+    for i in users[1:]:
+        gams = set(i.games)
+        games = games.intersection(gams)
 
     if tags is None:
         return games
