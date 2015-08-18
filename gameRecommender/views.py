@@ -21,13 +21,13 @@ def index(request):
         except ProfileNotFoundException:
             try:
                 user_list = request.session['user_list']
-            except ProfileNotFoundException:
+            except KeyError:
                 user_list = []
 
     else:
         try:
             user_list = request.session['user_list']
-        except ProfileNotFoundException:
+        except KeyError:
             user_list = []
 
     table = make_table(user_list)
