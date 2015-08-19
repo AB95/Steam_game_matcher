@@ -1,5 +1,7 @@
 import django
 
+from user import User
+
 
 if __name__ == "__main__":
     # tests go here
@@ -13,7 +15,10 @@ if __name__ == "__main__":
     #     print "===================================="
 
     django.setup()
-
+    usr = User("76561198189868938")
+    print usr
+    print usr.games.keys()
+    print str(usr.games.keys()[0])
     # 76561198032447319 Bouch
     # 76561198021143995 Matt
     # 76561198018709098 Dan
