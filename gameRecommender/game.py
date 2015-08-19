@@ -96,8 +96,12 @@ class Game:
             positive = votes[votes.find('t">')+4:votes.find(")</")]
             votes = str(soup.find(id="ReviewsTab_negative"))
             negative = votes[votes.find('t">')+4:votes.find(")</")]
-            self.positive_reviews = int(positive.replace(",", ""))
-            self.negative_reviews = int(negative.replace(",", ""))
+            try:
+                self.positive_reviews = int(positive.replace(",", ""))
+                self.negative_reviews = int(negative.replace(",", ""))
+            except ValueError:
+                self.positive_reviews = None
+                self.negative_reviews = None
 
             # Get features
             result2 = soup.findAll("a", {"class": "name"})
