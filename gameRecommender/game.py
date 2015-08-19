@@ -33,9 +33,6 @@ class Game:
     def __hash__(self):
         return hash(self.app_id)
 
-    def __repr__(self):
-        return self.name
-
     # Checks if game is in the database, otherwise scrapes the web for the data
     # If the page cannot be loaded for some reason, the game is not stored in the database
     def _get_details(self):

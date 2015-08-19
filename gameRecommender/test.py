@@ -15,9 +15,9 @@ if __name__ == "__main__":
     #     print "===================================="
 
     django.setup()
-    usr = User("76561198189868938")
+    usr = User("76561198032447319")
     print usr
-    print usr.games.keys()
+    print [i.name for i in usr.games.keys()]
     print str(usr.games.keys()[0])
     # 76561198032447319 Bouch
     # 76561198021143995 Matt
