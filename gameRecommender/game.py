@@ -135,7 +135,13 @@ class Game:
 
     # Made above list comprehensions easier to reason
     def has_tags(self, tags):
-        for i in tags:
-            if i not in self.tags:
+        if type(tags) == str:
+            if tags not in self.tags:
                 return False
+        elif type(tags) == list:
+            for i in tags:
+                if i not in self.tags:
+                    return False
+        else:
+            return False
         return True
