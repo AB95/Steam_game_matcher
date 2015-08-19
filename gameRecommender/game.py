@@ -6,7 +6,6 @@ import mechanize
 import crud
 import errors
 
-# TODO do the 503 error thingy bouchy
 
 class Game:
 
@@ -35,10 +34,14 @@ class Game:
         return hash(self.app_id)
 
     # Checks if game is in the database, otherwise scrapes the web for the data
+    # If the page cannot be loaded for some reason, the game is not stored in the database
     def _get_details(self):
         if not crud.game_in_db(self.app_id):
-            self._scrape_details()
-            crud.add_game_db(self)
+            try:
+                self._scrape_details()
+                crud.add_game_db(self)
+            except errors.PageNotLoadedException:
+                return
         else:
             game_info = crud.get_game_info(self.app_id)
             self.tags = [i["tags"] for i in game_info.gameTags.filter().values("tags")]
@@ -49,17 +52,18 @@ class Game:
             self.store_url = game_info.store_page
 
     # Scrapes info from the game's site
-    def _scrape_details(self):
+    def _scrape_details(self, repeat=False):
         url = "http://store.steampowered.com/app/" + str(self.app_id)
 
         # Use driver to generate full HTML
         br = mechanize.Browser()
         response = br.open(url)
 
-        # Make sure 503 code not received. Checking the code can throw an error sometimes, but not with a 503,
-        # and so can be effectively silenced
-        if response.code == 503:
-            self._scrape_details()
+        try:
+            if response.code == 503 and not repeat:
+                self._scrape_details(repeat=True)
+        except mechanize.HTTPError:
+            raise errors.PageNotLoadedException(self.app_id)
 
         # Make sure game exists
         if response.geturl() == "http://store.steampowered.com/":
@@ -92,12 +96,8 @@ class Game:
             positive = votes[votes.find('t">')+4:votes.find(")</")]
             votes = str(soup.find(id="ReviewsTab_negative"))
             negative = votes[votes.find('t">')+4:votes.find(")</")]
-            try:
-                self.positive_reviews = int(positive.replace(",", ""))
-                self.negative_reviews = int(negative.replace(",", ""))
-            except ValueError:
-                self.positive_reviews = 0
-                self.negative_reviews = 0
+            self.positive_reviews = int(positive.replace(",", ""))
+            self.negative_reviews = int(negative.replace(",", ""))
 
             # Get features
             result2 = soup.findAll("a", {"class": "name"})
