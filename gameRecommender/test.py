@@ -1,8 +1,5 @@
 import django
 
-import utils
-from user import User
-
 
 if __name__ == "__main__":
     # tests go here
@@ -16,7 +13,6 @@ if __name__ == "__main__":
     #     print "===================================="
 
     django.setup()
-    print [i.name for i in utils.get_matching_games(User("76561198032447319"), User("76561198189868938"), User("76561198189798351"), tags=["Action", "Action RPG"])]
 
     # 76561198032447319 Bouch
     # 76561198021143995 Matt
