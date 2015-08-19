@@ -37,7 +37,7 @@ def index(request):
 
 
 def make_table(list_users):
-    print list_users
+
     if list_users:
         users = list_users
         game_list = []
