@@ -1,7 +1,6 @@
 import django
 
 import utils
-
 from user import User
 
 
@@ -12,10 +11,19 @@ if __name__ == "__main__":
 
     import time
 
+    # start = time.time()
+    #
+    # usr1 = User("76561198039643526")
+    #
+    # print time.time() - start
+
     start = time.time()
 
-    usr1 = User("76561198039643526")
-    usr2 = User("76561197996666573")
+    usr1 = User("76561198000611224")
+    usr2 = User("76561198017902347")
+    usr3 = User("76561197971026489")
+    usr4 = User("76561197981142609")
+    usr5 = User("76561198026221141")
 
     mid = time.time()
     print mid - start
@@ -23,7 +31,11 @@ if __name__ == "__main__":
     for i in xrange(100):
         utils.get_matching_games(usr1, usr2)
 
-    print (time.time() - mid) / 100
+    final = (time.time() - mid) / 100
+
+    f = open("/home/bouch/Desktop/work", "w")
+    f.write("The final time was: " + str(final))
+    f.close()
 
     # print time.time() - mid
 

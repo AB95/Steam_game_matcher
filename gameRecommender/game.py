@@ -39,13 +39,8 @@ class Game:
     # Checks if game is in the database, otherwise scrapes the web for the data
     # If the page cannot be loaded for some reason, the game is not stored in the database
     def _get_details(self):
-        if not crud.game_in_db(self.app_id):
-            try:
-                self._scrape_details()
-                crud.add_game_db(self)
-            except errors.PageNotLoadedException:
-                return
-        else:
+
+        try:
             game_info = crud.get_game_info(self.app_id)
             self.tags = [i["tags"] for i in game_info.gameTags.filter().values("tags")]
             self.metascore = game_info.metascore
@@ -53,9 +48,16 @@ class Game:
             self.negative_reviews = game_info.negative_review_numbers
             self.features = [i["features"] for i in game_info.gameFeatures.filter().values("features")]
             self.store_url = game_info.store_page
+        except errors.NotInDatabaseException:
+            try:
+                self._scrape_details()
+                crud.add_game_db(self)
+            except errors.PageNotLoadedException:
+                return
 
     # Scrapes info from the game's site
     def _scrape_details(self, repeat=False):
+
         url = "http://store.steampowered.com/app/" + str(self.app_id)
 
         # Use driver to generate full HTML

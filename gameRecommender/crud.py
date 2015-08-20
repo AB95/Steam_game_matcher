@@ -2,7 +2,7 @@ __author__ = 'Dean'
 
 from django.db import IntegrityError
 
-from gameRecommender.models import GameInfo, GameTags, GameFeatures
+from gameRecommender.models import GameInfo, GameTags, GameFeatures, models
 import errors
 
 
@@ -16,12 +16,10 @@ def game_in_db(game_id):
 
 def get_game_info(game_id):
 
-    if game_in_db(game_id):
-
+    try:
         game = GameInfo.objects.get(app_ID=game_id)
         return game
-
-    else:
+    except models.ObjectDoesNotExist:
         raise errors.NotInDatabaseException("Game not in DB")
 
 
