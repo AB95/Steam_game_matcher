@@ -2,6 +2,7 @@ import django
 
 from user import User
 from gameRecommender import utils
+import time
 
 
 if __name__ == "__main__":
@@ -9,32 +10,41 @@ if __name__ == "__main__":
 
     django.setup()
 
-    import time
-
-    # start = time.time()
-    #
-    # usr1 = User("76561198018709098")
-    # usr2 = User("76561198032447319")
-    #
-    # print [i for i in utils.get_matching_games(usr1, usr2)]
-    #
-    # print time.time() - start
-
     start = time.time()
-
-    usr1 = User("76561198000611224")
-    usr2 = User("76561198017902347")
-    usr3 = User("76561197971026489")
-    usr4 = User("76561197981142609")
-    usr5 = User("76561198026221141")
-
+    #
+    usr1 = User("76561198039643526")
+    # usr2 = User("76561198032447319")
+    # usr3 = User("76561198021143995")
+    #
     mid = time.time()
     print mid - start
+    #
+    # for i in xrange(100):
+    #     utils.get_matching_games(usr1, usr2, usr3)
+    #
+    # print (time.time() - mid)/100
+    #
+    # print len([i.name for i in utils.get_matching_games(usr1, usr2, usr3)])
 
-    for i in xrange(100):
-        utils.get_matching_games(usr1, usr2)
-
-    final = (time.time() - mid) / 100
+    # print User("76561198189798351").games
+    #
+    # start = time.time()
+    #
+    # usr1 = User("76561198000611224")
+    # usr2 = User("76561198017902347")
+    # usr3 = User("76561197971026489")
+    # usr4 = User("76561197981142609")
+    # usr5 = User("76561198026221141")
+    #
+    # mid = time.time()
+    # print "Users processed:", mid - start
+    #
+    # for i in xrange(100):
+    #     utils.get_matching_games(usr1, usr2, usr3, usr4, usr5)
+    #
+    # final = (time.time() - mid) / 100
+    #
+    # print final
 
     # print time.time() - mid
 

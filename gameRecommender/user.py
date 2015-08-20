@@ -2,8 +2,8 @@ import urllib2 as urllib
 import json
 import xml.etree.ElementTree as et
 
+from gameRecommender import crud
 from errors import ProfileNotFoundException
-from game import Game
 from socket import timeout
 
 
@@ -41,15 +41,11 @@ class User:
 
         games_list = data["response"]["games"]
 
-        # from gameRecommender import crud
-
-        # self.games = [crud.get_game_info(i["appid"]) for i in games_list]
-
         # Parse the json, turn it into a Game object and add it to the user's game list
-        # TODO: Change from indexing to pythonic for loop
-        for i in xrange(len(games_list)):
-            print str(i+1) + "/" + str(self.games_total)
-            self.games[(Game(games_list[i]["appid"], games_list[i]["img_logo_url"], games_list[i]["name"]))] = int(games_list[i]["playtime_forever"])
+        self.games = {crud.get_game_info(i["appid"]): i["playtime_forever"] for i in games_list}
+
+        # Old way to do it, kept in case of things breaking
+        # self.games = {Game(i["appid"], i["img_logo_url"], i["name"]): i["playtime_forever"] for i in games_list}
 
         return self.games
 
