@@ -11,7 +11,7 @@ from .tables import GameTable
 
 
 def index(request):
-    # request.session.set_expiry(5)
+    request.session.set_expiry(5)
     if request.POST:
         user_id_1 = request.POST['user ID 1']
         user_id_2 = request.POST['user ID 2']
@@ -38,7 +38,7 @@ def index(request):
 
 
 def make_table(list_users):
-    print list_users
+
     if list_users:
         users = list_users
         game_list = []
