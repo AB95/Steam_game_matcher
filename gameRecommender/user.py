@@ -20,12 +20,26 @@ class User:
         # Construct URL for the api then grab the json
         url = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=E770C55138B535447F8678136EFC9285&steamid=" + \
             self.name + "&format=json&include_played_free_games=1&include_appinfo=1"
-        response = urllib.urlopen(url)
+
+        try:
+            response = urllib.urlopen(url)
+        except urllib.HTTPError:
+            print "Games could not be fetched due to", response.getcode(), "error"
+            return
+
         data = json.loads(response.read())
 
+        if data["response"] == {}:
+            print "Games could not be fetched due to false response"
+            return
+
         self.games_total = data["response"]["game_count"]
-        
+
         games_list = data["response"]["games"]
+
+        # from gameRecommender import crud
+
+        # self.games = [crud.get_game_info(i["appid"]) for i in games_list]
 
         # Parse the json, turn it into a Game object and add it to the user's game list
         # TODO: Change from indexing to pythonic for loop
