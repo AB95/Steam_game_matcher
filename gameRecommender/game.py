@@ -1,6 +1,9 @@
 import BeautifulSoup as bs
 import json
 
+# Needed for a mechanize exception only
+import urllib2
+
 import mechanize
 
 import crud
@@ -62,7 +65,7 @@ class Game:
         try:
             if response.code == 503 and not repeat:
                 self._scrape_details(repeat=True)
-        except mechanize.HTTPError:
+        except urllib2.HTTPError:
             response.close()
             br.close()
             raise errors.PageNotLoadedException(self.app_id)
@@ -70,6 +73,7 @@ class Game:
         # Make sure game exists
         if response.geturl() == "http://store.steampowered.com/":
             response.close()
+            br.clear_history()
             br.close()
             return
 
