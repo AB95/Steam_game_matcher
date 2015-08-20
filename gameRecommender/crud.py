@@ -6,6 +6,10 @@ from gameRecommender.models import GameInfo, GameTags, GameFeatures, models
 import errors
 
 
+def get_all_games():
+    return GameInfo.objects.all()
+
+
 def game_in_db(game_id):
 
     if GameInfo.objects.filter(app_ID=game_id):

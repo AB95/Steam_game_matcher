@@ -62,15 +62,15 @@ class Game:
 
         # Use driver to generate full HTML
         br = mechanize.Browser()
-        response = br.open(url)
 
         try:
-            if response.code == 503 and not repeat:
-                self._scrape_details(repeat=True)
+            response = br.open(url)
         except urllib2.HTTPError:
-            response.close()
-            br.close()
-            raise errors.PageNotLoadedException(self.app_id)
+            if not repeat:
+                self._scrape_details(repeat=True)
+            else:
+                br.close()
+                raise errors.PageNotLoadedException(self.app_id)
 
         # Make sure game exists
         if response.geturl() == "http://store.steampowered.com/":
