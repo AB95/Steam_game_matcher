@@ -4,6 +4,7 @@ import xml.etree.ElementTree as et
 
 from errors import ProfileNotFoundException
 from game import Game
+from socket import timeout
 
 
 class User:
@@ -22,9 +23,12 @@ class User:
             self.name + "&format=json&include_played_free_games=1&include_appinfo=1"
 
         try:
-            response = urllib.urlopen(url)
+            response = urllib.urlopen(url, timeout=20)
         except urllib.HTTPError:
             print "Games could not be fetched due to", response.getcode(), "error"
+            return
+        except timeout:
+            print "Games could not be fetched due to timeout"
             return
 
         data = json.loads(response.read())
