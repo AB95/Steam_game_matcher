@@ -5,20 +5,10 @@ from user import User
 
 if __name__ == "__main__":
     # tests go here
-    # django.setup()
-    # user = User(76561198032447319)
-    # games_list = user.get_games()
-    #
-    # for i in games_list.keys():
-    #     print i.name, games_list[i]
-    #     i.print_game()
-    #     print "===================================="
 
     django.setup()
-    usr = User("76561198032447319")
-    print usr
-    print [i.name for i in usr.games.keys()]
-    print str(usr.games.keys()[0])
+    usr = User("76561198021143995")
+
     # 76561198032447319 Bouch
     # 76561198021143995 Matt
     # 76561198018709098 Dan

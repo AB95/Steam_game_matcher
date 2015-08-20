@@ -63,10 +63,14 @@ class Game:
             if response.code == 503 and not repeat:
                 self._scrape_details(repeat=True)
         except mechanize.HTTPError:
+            response.close()
+            br.close()
             raise errors.PageNotLoadedException(self.app_id)
 
         # Make sure game exists
         if response.geturl() == "http://store.steampowered.com/":
+            response.close()
+            br.close()
             return
 
         # Bypass agecheck if necessary
@@ -79,8 +83,13 @@ class Game:
         # Parses the html using BeautifulSoup
         soup = bs.BeautifulSoup(response.read())
 
+        response.close()
+        br.clear_history()
+
         # Simple returns if a site error occurs
         if soup.title.string == "Site Error":
+            br.close()
+            soup.decompose()
             return
 
         try:
@@ -125,6 +134,9 @@ class Game:
 
         # Down here so that if the store page doesn't exist, is set to None
         self.store_url = url
+
+        br.close()
+        soup.decompose()
 
     def print_game(self):
         print "appid:", self.app_id
