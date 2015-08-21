@@ -41,8 +41,11 @@ class User:
 
         games_list = data["response"]["games"]
 
+        played_times = [i["playtime_forever"] for i in games_list]
+
         # Parse the json, turn it into a Game object and add it to the user's game list
-        self.games = {crud.get_game_info(i["appid"]): i["playtime_forever"] for i in games_list}
+        # self.games = {crud.get_game_info(i["appid"]): i["playtime_forever"] for i in games_list}
+        self.games = dict(zip(crud.get_all_games({i["appid"] for i in games_list}), played_times))
 
         # Old way to do it, kept in case of things breaking
         # self.games = {Game(i["appid"], i["img_logo_url"], i["name"]): i["playtime_forever"] for i in games_list}

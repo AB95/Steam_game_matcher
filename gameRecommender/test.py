@@ -10,24 +10,22 @@ if __name__ == "__main__":
 
     django.setup()
 
-    start = time.time()
+    # start = time.time()
     #
-    usr1 = User("76561198039643526")
-    # usr2 = User("76561198032447319")
-    # usr3 = User("76561198021143995")
+    # usr1 = User("76561198032447319")
+    # usr2 = User("76561198018709098")
+    # usr3 = User("76561198189868938")
     #
-    mid = time.time()
-    print mid - start
+    # mid = time.time()
+    # print mid - start
     #
     # for i in xrange(100):
     #     utils.get_matching_games(usr1, usr2, usr3)
     #
     # print (time.time() - mid)/100
     #
-    # print len([i.name for i in utils.get_matching_games(usr1, usr2, usr3)])
+    # print [i.game_name for i in utils.get_matching_games(usr1, usr2, usr3)]
 
-    # print User("76561198189798351").games
-    #
     # start = time.time()
     #
     # usr1 = User("76561198000611224")
