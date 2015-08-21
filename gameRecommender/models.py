@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 
 # Create your models here.
@@ -26,9 +27,10 @@ class GameInfo(models.Model):
     store_url = models.URLField(null=True, blank=True)
     gameTags = models.ManyToManyField(GameTags, null=True, blank=True)
     gameFeatures = models.ManyToManyField(GameFeatures, null=True, blank=True)
+    operating_systems = ArrayField(models.CharField(max_length=255, blank=True, null=True), size=3, null=True, blank=True)
 
     class Meta:
         ordering = ('app_id',)
 
     def __unicode__(self):
-        return self.game_name
+        return self.name

@@ -3,6 +3,7 @@ import django
 from user import User
 from gameRecommender import utils
 import time
+from game import Game
 
 
 if __name__ == "__main__":
@@ -10,21 +11,32 @@ if __name__ == "__main__":
 
     django.setup()
 
+    # game = Game("262060", "x", "Hero Siege")
+    # print game.operating_systems
+
     # start = time.time()
     #
-    # usr1 = User("76561198032447319")
-    # usr2 = User("76561198018709098")
-    # usr3 = User("76561198189868938")
-    #
+    usr1 = User("76561198032447319")
+    games = usr1.update_games()
+    print [i.name for i in games.keys() if games[i] > 0 and "linux" in i.operating_systems]
+    # usr2 = User("76561197996666573")
+    # usr3 = User("76561198047144666")
+
     # mid = time.time()
     # print mid - start
     #
     # for i in xrange(100):
-    #     utils.get_matching_games(usr1, usr2, usr3)
+    #     utils.get_matching_games([usr1, usr2, usr3])
     #
     # print (time.time() - mid)/100
+
+    # print time.time() - start
     #
-    # print [i.game_name for i in utils.get_matching_games(usr1, usr2, usr3)]
+    # games = utils.get_matching_games([usr1, usr2, usr3])
+    # print time.time() - start
+    # [i.name for i in utils.filter_by_tags([i for i in utils.filter_by_features(games, "Multi-player")], "Sandbox")]
+    # print time.time() - start
+
 
     # start = time.time()
     #
@@ -34,15 +46,13 @@ if __name__ == "__main__":
     # usr4 = User("76561197981142609")
     # usr5 = User("76561198026221141")
     #
-    # mid = time.time()
-    # print "Users processed:", mid - start
+    # print time.time() - start
     #
-    # for i in xrange(100):
-    #     utils.get_matching_games(usr1, usr2, usr3, usr4, usr5)
+    # games = utils.get_matching_games([usr1, usr2, usr3, usr4, usr5])
     #
-    # final = (time.time() - mid) / 100
+    # print len([i.name for i in utils.filter_by_features([i for i in utils.filter_by_tags(games, ["Sandbox", "Adventure"])], "Single-player")])
     #
-    # print final
+    # print time.time() - start
 
     # print time.time() - mid
 

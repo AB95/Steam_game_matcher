@@ -27,6 +27,7 @@ class Game:
         self.negative_reviews = None
         self.features = None
         self.store_url = None
+        self.operating_systems = []
 
         self._get_details()
 
@@ -44,10 +45,11 @@ class Game:
             game_info = crud.get_game_info(self.app_id)
             self.tags = [i["tags"] for i in game_info.gameTags.filter().values("tags")]
             self.metascore = game_info.metascore
-            self.positive_reviews = game_info.positive_review_numbers
-            self.negative_reviews = game_info.negative_review_numbers
+            self.positive_reviews = game_info.positive_reviews
+            self.negative_reviews = game_info.negative_reviews
             self.features = [i["features"] for i in game_info.gameFeatures.filter().values("features")]
-            self.store_url = game_info.store_page
+            self.store_url = game_info.store_url
+            self.operating_systems = game_info.operating_systems
         except errors.NotInDatabaseException:
             try:
                 self._scrape_details()
@@ -140,6 +142,15 @@ class Game:
         except (ValueError, AttributeError):
             self.metascore = None
 
+        # Find on which operating systems the game runs
+        self.operating_systems = []
+        if soup.find("span", {"class": "platform_img win"}):
+            self.operating_systems.append("win")
+        if soup.find("span", {"class": "platform_img mac"}):
+            self.operating_systems.append("mac")
+        if soup.find("span", {"class": "platform_img linux"}):
+            self.operating_systems.append("linux")
+
         # Down here so that if the store page doesn't exist, is set to None
         self.store_url = url
 
@@ -156,6 +167,7 @@ class Game:
         print "negative review count:", self.negative_reviews
         print "features:", self.features
         print "Store URL:", self.store_url
+        print "Operating systems:", self.operating_systems
 
     # Made above list comprehensions easier to reason
     def has_tags(self, tags):

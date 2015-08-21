@@ -1,6 +1,7 @@
 import urllib2 as urllib
 import json
 import xml.etree.ElementTree as et
+from game import Game
 
 from gameRecommender import crud
 from errors import ProfileNotFoundException
@@ -40,17 +41,22 @@ class User:
 
         self.games_total = data["response"]["game_count"]
 
-        games_list = data["response"]["games"]
+        self._games_list = data["response"]["games"]
 
-        played_times = [i["playtime_forever"] for i in games_list]
+        played_times = [i["playtime_forever"] for i in self._games_list]
 
         # Parse the json, turn it into a Game object and add it to the user's game list
         # self.games = {crud.get_game_info(i["appid"]): i["playtime_forever"] for i in games_list}
-        self.games = dict(zip(crud.get_all_games({i["appid"] for i in games_list}), played_times))
+        self.games = dict(zip(crud.get_all_games({i["appid"] for i in self._games_list}), played_times))
 
         # Old way to do it, kept in case of things breaking
         # self.games = {Game(i["appid"], i["img_logo_url"], i["name"]): i["playtime_forever"] for i in games_list}
 
+        return self.games
+
+    # Grabs new game data from the internet rather than from the database
+    def update_games(self):
+        self.games = {Game(i["appid"], i["img_logo_url"], i["name"]): i["playtime_forever"] for i in self._games_list}
         return self.games
 
     # Grabs the user's friends list in the form of their Steam id's
