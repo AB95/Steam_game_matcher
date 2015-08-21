@@ -7,12 +7,12 @@ import errors
 
 
 def get_all_games(game_list):
-    return list(GameInfo.objects.filter(app_ID__in=game_list))
+    return list(GameInfo.objects.filter(app_id__in=game_list))
 
 
 def game_in_db(game_id):
 
-    if GameInfo.objects.filter(app_ID=game_id):
+    if GameInfo.objects.filter(app_id=game_id):
         return True
     else:
         return False
@@ -21,7 +21,7 @@ def game_in_db(game_id):
 def get_game_info(game_id):
 
     try:
-        game = GameInfo.objects.get(app_ID=game_id)
+        game = GameInfo.objects.get(app_id=game_id)
         return game
     except models.ObjectDoesNotExist:
         raise errors.NotInDatabaseException("Game not in DB")
@@ -53,10 +53,10 @@ def add_game_db(game_object):
 
     else:
 
-        new_game = GameInfo(game_name=game_object.name, app_ID=game_object.app_id, metascore=game_object.metascore,
-                            positive_review_numbers=game_object.positive_reviews,
-                            negative_review_numbers=game_object.negative_reviews,
-                            picture=game_object.image_url, store_page=game_object.store_url)
+        new_game = GameInfo(name=game_object.name, app_id=game_object.app_id, metascore=game_object.metascore,
+                            positive_reviews=game_object.positive_reviews,
+                            negative_reviews=game_object.negative_reviews,
+                            image_url=game_object.image_url, store_url=game_object.store_url)
         new_game.save()
 
         if game_object.tags:

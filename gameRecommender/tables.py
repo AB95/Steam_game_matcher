@@ -12,8 +12,8 @@ class GameTable(tables.Table):
     def render_game_tags_column(self, record):
 
         data = ''
-        game_id = record.app_ID
-        game = GameInfo.objects.get(app_ID=game_id)
+        game_id = record.app_id
+        game = GameInfo.objects.get(app_id=game_id)
         tags = game.gameTags.filter().values('tags')
 
         for item in tags:
@@ -24,8 +24,8 @@ class GameTable(tables.Table):
     def render_game_features_column(self, record):
 
         data = ''
-        game_id = record.app_ID
-        game = GameInfo.objects.get(app_ID=game_id)
+        game_id = record.app_id
+        game = GameInfo.objects.get(app_id=game_id)
         features = game.gameFeatures.filter().values('features')
 
         for item in features:
