@@ -58,6 +58,8 @@ class Game:
     # Scrapes info from the game's site
     def _scrape_details(self, repeat=False):
 
+        # TODO: Handle timeouts etc.
+
         url = "http://store.steampowered.com/app/" + str(self.app_id)
 
         # Use driver to generate full HTML

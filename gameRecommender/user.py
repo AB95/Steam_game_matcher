@@ -22,6 +22,7 @@ class User:
         url = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=E770C55138B535447F8678136EFC9285&steamid=" + \
             self.name + "&format=json&include_played_free_games=1&include_appinfo=1"
 
+        # TODO: Throw specific exceptions for this
         try:
             response = urllib.urlopen(url, timeout=20)
         except urllib.HTTPError:

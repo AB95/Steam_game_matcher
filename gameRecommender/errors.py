@@ -1,5 +1,6 @@
 
 
+# TODO: Make more descriptive
 class AlreadyInDatabaseException(Exception):
     def __init__(self, value):
         self.value = str(value.app_id) + " " + value.name
