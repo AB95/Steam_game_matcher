@@ -5,6 +5,7 @@ import user
 import utils
 from .models import GameInfo
 from .tables import GameTable
+from .forms import UserIDForm
 
 
 # TODO show errors for incorrect user names/ids and clean up
@@ -13,8 +14,8 @@ from .tables import GameTable
 def index(request):
     request.session.set_expiry(5)
     if request.POST:
-        user_id_1 = request.POST['user ID 1']
-        user_id_2 = request.POST['user ID 2']
+        user_id_1 = request.POST['user_ID_1']
+        user_id_2 = request.POST['user_ID_2']
 
         try:
             user_list = [user.User(user_id_1), user.User(user_id_2)]
@@ -31,9 +32,10 @@ def index(request):
         except KeyError:
             user_list = []
 
+    form = UserIDForm()
     table = make_table(user_list)
     RequestConfig(request).configure(table)
-    context = {'game_list': table}
+    context = {'game_list': table, 'form': form}
     return render(request, 'gameRecommender/index.html', context)
 
 

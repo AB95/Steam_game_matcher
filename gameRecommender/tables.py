@@ -8,13 +8,23 @@ class GameTable(tables.Table):
 
     game_tags_column = tables.Column(empty_values=(), accessor='gameTags', orderable=False)
     game_features_column = tables.Column(empty_values=(), accessor='gameFeatures', orderable=False)
+    operating_systems_column = tables.Column(accessor='operating_systems', orderable=False)
+
+    def render_operating_systems_column(self, value):
+
+        data = ''
+        operating_systems = value
+
+        for item in operating_systems:
+            data += item + ' '
+
+        return data
+
 
     def render_game_tags_column(self, record):
 
         data = ''
-        game_id = record.app_id
-        game = GameInfo.objects.get(app_id=game_id)
-        tags = game.gameTags.filter().values('tags')
+        tags = record.gameTags.filter().values('tags')
 
         for item in tags:
             data += item['tags'] + ' '
@@ -24,9 +34,7 @@ class GameTable(tables.Table):
     def render_game_features_column(self, record):
 
         data = ''
-        game_id = record.app_id
-        game = GameInfo.objects.get(app_id=game_id)
-        features = game.gameFeatures.filter().values('features')
+        features = record.gameFeatures.filter().values('features')
 
         for item in features:
             data += item['features'] + ' '
@@ -35,5 +43,6 @@ class GameTable(tables.Table):
 
     class Meta:
         model = GameInfo
+        fields = ('name', 'app_id', 'metascore', 'positive_reviews', 'negative_reviews', 'store_url')
         # add class="paleblue" to <table> tag
         attrs = {"class": "paleblue"}
