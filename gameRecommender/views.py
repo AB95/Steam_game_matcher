@@ -45,10 +45,7 @@ def index(request):
 def make_table(list_users):
 
     if list_users:
-        users = list_users
-        game_list = []
-        for item in utils.get_matching_games(users):
-            game_list.append(GameInfo.objects.get(app_id=item.app_id))
+        game_list = utils.get_matching_games(list_users)
         table = GameTable(game_list)
     else:
         table = GameTable(GameInfo.objects.all())
