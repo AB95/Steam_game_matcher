@@ -13,29 +13,32 @@ from .forms import UserIDForm
 
 def index(request):
     request.session.set_expiry(5)
-    if request.POST:
-        user_id_1 = request.POST['user_ID_1']
-        user_id_2 = request.POST['user_ID_2']
+    user_list = []
+    if request.method == 'POST':
+        form = UserIDForm(request.POST)
+        if form.is_valid():
+            user_id_1 = request.POST['user_ID_1']
+            user_id_2 = request.POST['user_ID_2']
 
-        try:
-            user_list = [user.User(user_id_1), user.User(user_id_2)]
-            request.session['user_list'] = user_list
-        except ProfileNotFoundException:
             try:
-                user_list = request.session['user_list']
-            except KeyError:
-                user_list = []
+                user_list = [user.User(user_id_1), user.User(user_id_2)]
+                request.session['user_list'] = user_list
+            except ProfileNotFoundException:
+                try:
+                    user_list = request.session['user_list']
+                except KeyError:
+                    user_list = []
 
     else:
         try:
             user_list = request.session['user_list']
         except KeyError:
-            user_list = []
+            pass
 
-    form = UserIDForm()
+    user_form = UserIDForm()
     table = make_table(user_list)
     RequestConfig(request).configure(table)
-    context = {'game_list': table, 'form': form}
+    context = {'game_list': table, 'form': user_form}
     return render(request, 'gameRecommender/index.html', context)
 
 
