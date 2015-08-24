@@ -9,7 +9,8 @@ class GameTable(tables.Table):
     game_tags_column = tables.Column(empty_values=(), accessor='gameTags', orderable=False)
     game_features_column = tables.Column(empty_values=(), accessor='gameFeatures', orderable=False)
     operating_systems_column = tables.Column(accessor='operating_systems', orderable=False)
-    name_column = tables.TemplateColumn('<a href="{{record.store_url}}">{{record.name}}</a>', verbose_name='Name')
+    name_column = tables.TemplateColumn('<a href="{{record.store_url}}">{{record.name}}</a>', verbose_name='Name',
+                                        accessor='name')
 
     def render_operating_systems_column(self, value):
 
