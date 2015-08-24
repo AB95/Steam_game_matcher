@@ -9,6 +9,7 @@ class GameTable(tables.Table):
     game_tags_column = tables.Column(empty_values=(), accessor='gameTags', orderable=False)
     game_features_column = tables.Column(empty_values=(), accessor='gameFeatures', orderable=False)
     operating_systems_column = tables.Column(accessor='operating_systems', orderable=False)
+    name_column = tables.TemplateColumn('<a href="{{record.store_url}}">{{record.name}}</a>', verbose_name='Name')
 
     def render_operating_systems_column(self, value):
 
@@ -19,7 +20,6 @@ class GameTable(tables.Table):
             data += item + ' '
 
         return data
-
 
     def render_game_tags_column(self, record):
 
@@ -43,6 +43,8 @@ class GameTable(tables.Table):
 
     class Meta:
         model = GameInfo
-        fields = ('name', 'app_id', 'metascore', 'positive_reviews', 'negative_reviews', 'store_url')
+        fields = ('app_id', 'metascore', 'positive_reviews', 'negative_reviews')
         # add class="paleblue" to <table> tag
         attrs = {"class": "paleblue"}
+        order_by = 'app_id'
+        sequence = ('name_column', '...')
