@@ -4,7 +4,7 @@ import xml.etree.ElementTree as et
 from game import Game
 
 from gameRecommender import crud
-from errors import ProfileNotFoundException
+from errors import ProfileNotFoundException, InvalidInputException
 from socket import timeout
 
 
@@ -76,27 +76,31 @@ class User:
         return [i for i in self.games.keys() if i.has_tags(tags)]
 
     # Determines whether the user's ID or vanity URL was passed in and fetches the ID if it was a vanity URL
+    # Uses broad exception clauses as any input that does not work here is invalid
     def _get_id(self, username):
         try:
             assert len(username) >= 16
             int(username)
             return username
-        except (AssertionError, ValueError):
-            if "steamcommunity.com" in username:
-                url = username
-                if "www." not in username:
-                    url = "www." + url
-                if "http://" not in username:
-                    url = "http://" + url
-                if "?xml=1" not in username:
-                    url += "?xml=1"
-            else:
-                url = "http://www.steamcommunity.com/id/" + username + "?xml=1"
-            response = urllib.urlopen(url)
-            tree = et.parse(response)
-            root = tree.getroot()
-            text = root[0].text
-            if text == "The specified profile could not be found.":
-                raise ProfileNotFoundException(username)
-            else:
-                return text
+        except:
+            try:
+                if "steamcommunity.com" in username:
+                    url = username
+                    if "www." not in username:
+                        url = "www." + url
+                    if "http://" not in username:
+                        url = "http://" + url
+                    if "?xml=1" not in username:
+                        url += "?xml=1"
+                else:
+                    url = "http://www.steamcommunity.com/id/" + username + "?xml=1"
+                response = urllib.urlopen(url)
+                tree = et.parse(response)
+                root = tree.getroot()
+                text = root[0].text
+                if text == "The specified profile could not be found.":
+                    raise ProfileNotFoundException(username)
+                else:
+                    return text
+            except:
+                raise InvalidInputException(username)

@@ -21,11 +21,28 @@ if __name__ == "__main__":
     # games = usr1.update_games()
     # print [i.operating_systems for i in games.keys() if games[i] > 0 and "linux" in i.operating_systems]
 
-    usr1 = User("76561198000611224")
+    # start = time.time()
+    # usr1 = User("76561198000611224")
+    # print time.time() - start
+    # usr2 = User("76561198017902347")
+    # print time.time() - start
+    # usr3 = User("76561197971026489")
+    # print time.time() - start
+    # games = utils.get_matching_games([usr1, usr2, usr3])
+    # games = utils.filter_by_os(games, "linux")
+    # games = utils.filter_by_tags(games, ["Co-op", "RPG", "Sandbox"])
+    # games = utils.filter_by_features(games, "Co-op")
+    # print time.time() - start
 
     start = time.time()
-    utils.filter_by_os(usr1.games, "linux")
+    bouch = User("alexishbob2")
+    games = bouch.games
+    games = utils.filter_by_os(games, "linux")
+    games = utils.filter_by_tags(games, ["Co-op", "RPG", "Sandbox"])
+    games = utils.filter_by_features(games, "Co-op")
     print time.time() - start
+
+    print len(games)
 
     # usr2 = User("76561197996666573")
     # usr3 = User("76561198047144666")
