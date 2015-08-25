@@ -42,7 +42,7 @@ if __name__ == "__main__":
     games = utils.filter_by_features(games, "Co-op")
     print time.time() - start
 
-    print len(games)
+    print games
 
     # usr2 = User("76561197996666573")
     # usr3 = User("76561198047144666")

@@ -11,24 +11,30 @@ def get_all_games(game_list):
 
 
 def get_all_games_by_tag(tags):
-    if type(tags) == list:
-        return set(GameInfo.objects.filter(gameTags__tags__in=tags))
-    elif type(tags) == str:
-        return set(GameInfo.objects.filter(gameTags__tags__in=[tags]))
+    if type(tags) == str:
+        tags = [tags]
+    games = GameInfo.objects.all()
+    for i in tags:
+        games = games.filter(gameTags__tags__in=[i])
+    return set(games)
 
 
 def get_all_games_by_feature(features):
-    if type(features) == list:
-        return set(GameInfo.objects.filter(gameFeatures__features__in=features))
-    elif type(features) == str:
-        return set(GameInfo.objects.filter(gameFeatures__features__in=[features]))
+    if type(features) == str:
+        features = [features]
+    games = GameInfo.objects.all()
+    for i in features:
+        games = games.filter(gameFeatures__features__in=[i])
+    return set(games)
 
 
 def get_all_games_by_os(os):
-    if type(os) == list:
-        return set(GameInfo.objects.filter(operating_systems__contains=os))
-    elif type(os) == str:
-        return set(GameInfo.objects.filter(operating_systems__contains=[os]))
+    if type(os) == str:
+        os = [os]
+    games = GameInfo.objects.all()
+    for i in os:
+        games = games.filter(operating_systems__contains=[i])
+    return set(games)
 
 
 def game_in_db(game_id):
