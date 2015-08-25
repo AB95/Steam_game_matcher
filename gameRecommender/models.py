@@ -9,6 +9,9 @@ class GameTags(models.Model):
     def __unicode__(self):
         return self.tags
 
+    class Meta:
+        ordering = ('tags',)
+
 
 class GameFeatures (models.Model):
     features = models.CharField(unique=True, max_length=255)

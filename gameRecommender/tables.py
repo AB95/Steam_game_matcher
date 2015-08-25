@@ -6,8 +6,9 @@ from gameRecommender.models import GameInfo
 
 class GameTable(tables.Table):
 
-    game_tags_column = tables.Column(empty_values=(), accessor='gameTags', orderable=False)
-    game_features_column = tables.Column(empty_values=(), accessor='gameFeatures', orderable=False)
+    game_tags_column = tables.Column(empty_values=(), accessor='gameTags', orderable=False, verbose_name='Game Tags')
+    game_features_column = tables.Column(empty_values=(), accessor='gameFeatures', orderable=False,
+                                         verbose_name='Game Features')
     operating_systems_column = tables.Column(accessor='operating_systems', orderable=False)
     name_column = tables.TemplateColumn('<a href="{{record.store_url}}">{{record.name}}</a>', verbose_name='Name',
                                         accessor='name')

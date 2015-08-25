@@ -1,6 +1,6 @@
 __author__ = 'Dean'
 
-from django.db import IntegrityError, DataError
+from django.db import IntegrityError
 
 from gameRecommender.models import GameInfo, GameTags, GameFeatures, models
 import errors
