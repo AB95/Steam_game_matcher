@@ -1,7 +1,7 @@
 import django
 
 from user import User
-from gameRecommender import utils
+from gameRecommender import utils, crud
 import time
 from game import Game
 
@@ -16,9 +16,17 @@ if __name__ == "__main__":
 
     # start = time.time()
     #
-    usr1 = User("76561198032447319")
-    games = usr1.update_games()
-    print [i.name for i in games.keys() if games[i] > 0 and "linux" in i.operating_systems]
+
+    # usr1 = User("76561198032447319")
+    # games = usr1.update_games()
+    # print [i.operating_systems for i in games.keys() if games[i] > 0 and "linux" in i.operating_systems]
+
+    usr1 = User("76561198000611224")
+
+    start = time.time()
+    utils.filter_by_os(usr1.games, "linux")
+    print time.time() - start
+
     # usr2 = User("76561197996666573")
     # usr3 = User("76561198047144666")
 
@@ -40,11 +48,11 @@ if __name__ == "__main__":
 
     # start = time.time()
     #
-    # usr1 = User("76561198000611224")
-    # usr2 = User("76561198017902347")
-    # usr3 = User("76561197971026489")
-    # usr4 = User("76561197981142609")
-    # usr5 = User("76561198026221141")
+    # usr1 = User("76561198000611224").update_games()
+    # usr2 = User("76561198017902347").update_games()
+    # usr3 = User("76561197971026489").update_games()
+    # usr4 = User("76561197981142609").update_games()
+    # usr5 = User("76561198026221141").update_games()
     #
     # print time.time() - start
     #

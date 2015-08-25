@@ -1,3 +1,4 @@
+from gameRecommender import crud
 
 
 # Takes in a list of users and returns all games they have in common
@@ -13,30 +14,12 @@ def get_matching_games(users):
 
 
 def filter_by_tags(games, tags):
-    return {i for i in games if has_tags(i, tags)}
+    return set(games).intersection(crud.get_all_games_by_tag(tags))
 
 
 def filter_by_features(games, features):
-    return {i for i in games if has_features(i, features)}
+    return set(games).intersection(crud.get_all_games_by_feature(features))
 
 
-def has_tags(game, tags):
-    game_tags = {i["tags"] for i in game.gameTags.filter().values("tags")}
-    if type(tags) == list:
-        for i in tags:
-            if i not in game_tags:
-                return False
-        return True
-    else:
-        return tags in game_tags
-
-
-def has_features(game, features):
-    game_features = {i["features"] for i in game.gameFeatures.filter().values("features")}
-    if type(features) == list:
-        for i in features:
-            if i not in game_features:
-                return False
-        return True
-    else:
-        return features in game_features
+def filter_by_os(games, os):
+    return set(games).intersection(crud.get_all_games_by_os(os))
