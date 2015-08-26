@@ -20,3 +20,17 @@ class TagForm(forms.Form):
         list.append((item['tags'], item['tags']))
 
     tags = forms.ChoiceField(choices=list, widget=forms.CheckboxSelectMultiple())
+
+
+class FeaturesForm(forms.Form):
+    list = []
+    for item in models.GameFeatures.objects.values('features'):
+        list.append((item['features'], item['features']))
+
+    features = forms.ChoiceField(choices=list, widget=forms.CheckboxSelectMultiple())
+
+
+class OSForm(forms.Form):
+    list = [('win','win'), ('mac', 'mac'), ('linux', 'linux')]
+
+    operating_systems = forms.ChoiceField(choices=list, widget=forms.CheckboxSelectMultiple())

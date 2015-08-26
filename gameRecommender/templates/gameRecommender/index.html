@@ -8,8 +8,20 @@
         <form method="post">
         {% csrf_token %}
             Tags:<br>
-            {% for check in tag_form.tags %}
-                {{ check }}
+            {% for tag in tag_form.tags %}
+                {{ tag }}
+            {% endfor %}
+            <br>
+            <br>
+            Features:<br>
+            {% for feature in features_form.features %}
+                {{ feature }}
+            {% endfor %}
+            <br>
+            <br>
+            OS:<br>
+            {% for operating_system in operating_systems_form.operating_systems %}
+                {{ operating_system }}
             {% endfor %}
             <br>
             <br>
