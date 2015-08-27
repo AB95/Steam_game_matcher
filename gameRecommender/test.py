@@ -1,9 +1,9 @@
 import django
 
 from user import User
-from gameRecommender import utils, crud
+from gameRecommender import utils
 import time
-from game import Game
+
 
 
 if __name__ == "__main__":
@@ -62,7 +62,6 @@ if __name__ == "__main__":
     # [i.name for i in utils.filter_by_tags([i for i in utils.filter_by_features(games, "Multi-player")], "Sandbox")]
     # print time.time() - start
 
-
     # start = time.time()
     #
     # usr1 = User("76561198000611224").update_games()
@@ -75,7 +74,8 @@ if __name__ == "__main__":
     #
     # games = utils.get_matching_games([usr1, usr2, usr3, usr4, usr5])
     #
-    # print len([i.name for i in utils.filter_by_features([i for i in utils.filter_by_tags(games, ["Sandbox", "Adventure"])], "Single-player")])
+    # print len([i.name for i in utils.filter_by_features([i for i in utils.filter_by_tags(games,
+    # ["Sandbox", "Adventure"])], "Single-player")])
     #
     # print time.time() - start
 

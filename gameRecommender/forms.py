@@ -31,6 +31,6 @@ class FeaturesForm(forms.Form):
 
 
 class OSForm(forms.Form):
-    list = [('win','win'), ('mac', 'mac'), ('linux', 'linux')]
+    list = [('win', 'win'), ('mac', 'mac'), ('linux', 'linux')]
 
     operating_systems = forms.ChoiceField(choices=list, widget=forms.CheckboxSelectMultiple())
