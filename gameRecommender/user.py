@@ -15,12 +15,17 @@ class User:
         self.name = self._get_id(str(name))
         self.games_total = 0
         self.games = {}
+        self._games_list = []
         self.friends = []
         self.get_games()
 
     def get_games(self):
         # Construct URL for the api then grab the json
-        url = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=E770C55138B535447F8678136EFC9285&steamid=" + \
+
+        with open("gameRecommender/key.txt", "r") as f:
+            key = f.read()
+
+        url = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + key + "&steamid=" + \
             self.name + "&format=json&include_played_free_games=1&include_appinfo=1"
 
         # TODO: Throw specific exceptions for this
@@ -61,7 +66,11 @@ class User:
 
     # Grabs the user's friends list in the form of their Steam id's
     def get_friends(self):
-        url = "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=E770C55138B535447F8678136EFC9285&steamid=" + \
+
+        with open("key.txt", "r") as f:
+            key = f.read()
+
+        url = "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=" + key + "&steamid=" + \
               self.name + "&relationship=friend"
         response = urllib.urlopen(url)
         data = json.loads(response.read())
